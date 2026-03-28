@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { CSSProperties } from "react";
 
 const CONFIG = {
   nombre:          "Mar & Mesa",
@@ -21,14 +22,48 @@ const MUTED  = "rgba(26,46,59,0.42)";
 const BORDER = "rgba(26,46,59,0.10)";
 const FONTS  = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap');`;
 
+// ── Types ──
+type Lang = "es" | "en" | "pt" | "it" | "fr" | "ru";
+
+interface CartItem {
+  nombre: string;
+  emoji: string;
+  precio: number;
+  cantidad: number;
+  t?: Record<string, string[]>;
+}
+
+interface Survey {
+  estrellas: number;
+  idioma_util: string;
+  comodidad: string;
+  volveria: string;
+  comentario: string;
+  lang: string;
+  fecha: string;
+}
+
+interface MenuItem {
+  categoria: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  disponible: boolean;
+  emoji: string;
+  promo: boolean;
+  t: Record<string, string[]>;
+}
+
 // ── Shared sketch props ──
-const SK  = { fill:"none", stroke:TEAL, strokeWidth:1.0, strokeLinecap:"round", strokeLinejoin:"round" };
-const SKT = { fill:"none", stroke:TEAL, strokeWidth:0.55, strokeLinecap:"round", strokeLinejoin:"round" };
-const SKF = { fill:"rgba(74,143,168,0.07)", stroke:TEAL, strokeWidth:0.85, strokeLinecap:"round", strokeLinejoin:"round" };
+const SK  = { fill:"none", stroke:TEAL, strokeWidth:1.0, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
+const SKT = { fill:"none", stroke:TEAL, strokeWidth:0.55, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
+const SKF = { fill:"rgba(74,143,168,0.07)", stroke:TEAL, strokeWidth:0.85, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
 
 // ─── Creature SVG components ───────────────────────────
 
-const SketchCrab = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
+interface CreatureProps { x?: number; y?: number; scale?: number; opacity?: number; flip?: boolean; }
+
+const SketchCrab = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${flip?-scale:scale},${scale})`} opacity={opacity}>
     <ellipse cx="0" cy="0" rx="34" ry="24" {...SKF}/>
     <path d="M-34,0 Q-52,-8 -62,-18 Q-70,-26 -64,-34 Q-56,-42 -46,-34 Q-36,-26 -32,-14 Q-28,-4 -28,6" {...SKF}/>
@@ -45,7 +80,7 @@ const SketchCrab = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
   </g>
 );
 
-const SketchShrimp = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
+const SketchShrimp = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${flip?-scale:scale},${scale})`} opacity={opacity}>
     <path d="M0,0 Q18,-6 28,4 Q36,14 32,28 Q26,42 14,50 Q2,56 -10,52 Q-22,46 -26,34 Q-30,20 -24,8 Q-16,-2 0,0Z" {...SKF}/>
     <path d="M-28,18 Q-44,14 -48,4 Q-46,-8 -36,-6 Q-26,-2 -24,10" {...SKF}/>
@@ -59,7 +94,7 @@ const SketchShrimp = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
   </g>
 );
 
-const SketchFish = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
+const SketchFish = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${flip?-scale:scale},${scale})`} opacity={opacity}>
     <path d="M-40,0 Q-24,-8 -8,0 Q-24,8 -40,0Z" {...SKF}/>
     <path d="M-40,0 L-56,-10 L-52,0 L-56,10 Z" {...SKF}/>
@@ -72,7 +107,7 @@ const SketchFish = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
   </g>
 );
 
-const SketchOctopus = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
+const SketchOctopus = ({ x=0, y=0, scale=1, opacity=0.25 }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
     <ellipse cx="0" cy="-10" rx="24" ry="20" {...SKF}/>
     <circle cx="-9" cy="-14" r="3.5" {...SKF}/><circle cx="-9" cy="-14" r="1.4" fill={TEAL} stroke="none"/>
@@ -88,7 +123,7 @@ const SketchOctopus = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
   </g>
 );
 
-const SketchScallop = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
+const SketchScallop = ({ x=0, y=0, scale=1, opacity=0.25 }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
     <path d="M-28,6 Q-28,-14 0,-20 Q28,-14 28,6 Q28,26 0,32 Q-28,26 -28,6Z" {...SKF}/>
     <path d="M0,-20 L0,32" {...SKT}/><path d="M-18,-16 L-18,30" {...SKT}/><path d="M18,-16 L18,30" {...SKT}/>
@@ -98,7 +133,7 @@ const SketchScallop = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
   </g>
 );
 
-const SketchMussel = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
+const SketchMussel = ({ x=0, y=0, scale=1, opacity=0.25 }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
     <path d="M0,-30 Q22,-28 30,-10 Q34,10 22,26 Q10,40 -8,38 Q-26,34 -30,16 Q-34,-4 -22,-20 Q-12,-32 0,-30Z" {...SKF}/>
     <path d="M0,-30 L-2,36" {...SKT}/>
@@ -107,7 +142,7 @@ const SketchMussel = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
   </g>
 );
 
-const SketchLobster = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
+const SketchLobster = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${flip?-scale:scale},${scale})`} opacity={opacity}>
     <path d="M0,0 Q22,-4 30,10 Q36,24 28,38 Q18,52 2,56 Q-14,58 -24,46 Q-34,32 -28,16 Q-20,0 0,0Z" {...SKF}/>
     <path d="M-30,18 Q-46,12 -48,2 Q-46,-10 -34,-8 Q-24,-2 -22,12" {...SKF}/>
@@ -121,7 +156,7 @@ const SketchLobster = ({ x=0, y=0, scale=1, opacity=0.25, flip=false }) => (
   </g>
 );
 
-const SketchStarfish = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
+const SketchStarfish = ({ x=0, y=0, scale=1, opacity=0.25 }: CreatureProps) => (
   <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
     <path d="M0,-30 L5,-8 L26,-18 L10,-2 L30,8 L8,8 L14,30 L0,14 L-14,30 L-8,8 L-30,8 L-10,-2 L-26,-18 L-5,-8 Z" {...SKF}/>
     <path d="M0,-30 L0,14" {...SKT}/><path d="M26,-18 L-14,30" {...SKT}/><path d="M-26,-18 L14,30" {...SKT}/>
@@ -130,7 +165,7 @@ const SketchStarfish = ({ x=0, y=0, scale=1, opacity=0.25 }) => (
 );
 
 // ── 8 creatures cycling through menu ──
-const CREATURES = [
+const CREATURES: Array<(p: CreatureProps) => JSX.Element> = [
   (p) => <SketchCrab {...p}/>,
   (p) => <SketchShrimp {...p}/>,
   (p) => <SketchFish {...p}/>,
@@ -141,8 +176,7 @@ const CREATURES = [
   (p) => <SketchStarfish {...p}/>,
 ];
 
-// ── Divider with creature between dishes ──
-const CreatureDivider = ({ index }) => {
+const CreatureDivider = ({ index }: { index: number }) => {
   const Creature = CREATURES[index % CREATURES.length];
   const flip = index % 3 === 1;
   const side = index % 2 === 0 ? "left" : "right";
@@ -162,8 +196,7 @@ const CreatureDivider = ({ index }) => {
   );
 };
 
-// ── Full-page sketch background ──
-const SeafoodSketchBg = ({ opacity=0.18 }) => (
+const SeafoodSketchBg = ({ opacity=0.18 }: { opacity?: number }) => (
   <svg viewBox="0 0 480 820" preserveAspectRatio="xMidYMid slice"
     style={{ position:"absolute", inset:0, width:"100%", height:"100%", pointerEvents:"none" }}>
     <g opacity={opacity}>
@@ -211,7 +244,7 @@ const WaveDivider = () => (
 );
 
 // ===================== TRADUCCIONES =====================
-const T = {
+const T: Record<Lang, Record<string, string>> = {
   es: { flag:"🇪🇸", langName:"Español",   todo:"Todo", oferta:"Chef recomienda", efectivo:"Efectivo", tarjeta:"Tarjeta", precios:"Precios en pesos argentinos · IVA incluido", verPedido:"🛒 Carrito", tuPedido:"Tu pedido", revisaPedido:"Revisá tu pedido", mostrarMozo:"¡Listo! Mostrá esta pantalla al mozo", instruccion:"El mozo tomará nota de tu pedido", carritoVacio:"Tu carrito está vacío", verMenu:"Ver menú", confirmar:"Confirmar y llamar al mozo", volver:"← Volver", cu:"c/u", item:"item", items:"items", nuevoPedido:"Nuevo pedido", encuesta:"¿Cómo fue tu experiencia?", enviarEncuesta:"Enviar opinión", saltarEncuesta:"Saltar", graciasEncuesta:"¡Gracias! 🙏" },
   en: { flag:"🇬🇧", langName:"English",   todo:"All",  oferta:"Chef recommends", efectivo:"Cash", tarjeta:"Card", precios:"Prices in Argentine pesos · VAT included", verPedido:"🛒 Cart", tuPedido:"Your order", revisaPedido:"Review your order", mostrarMozo:"Done! Show this screen to the waiter", instruccion:"The waiter will take note of your order", carritoVacio:"Your cart is empty", verMenu:"See menu", confirmar:"Confirm & call waiter", volver:"← Back", cu:"each", item:"item", items:"items", nuevoPedido:"New order", encuesta:"How was your experience?", enviarEncuesta:"Send feedback", saltarEncuesta:"Skip", graciasEncuesta:"Thanks! 🙏" },
   pt: { flag:"🇧🇷", langName:"Português", todo:"Tudo", oferta:"Chef recomenda", efectivo:"Dinheiro", tarjeta:"Cartão", precios:"Preços em pesos argentinos · IVA incluído", verPedido:"🛒 Carrinho", tuPedido:"Seu pedido", revisaPedido:"Revise seu pedido", mostrarMozo:"Pronto! Mostre esta tela ao garçom", instruccion:"O garçom anotará seu pedido", carritoVacio:"Seu carrinho está vazio", verMenu:"Ver cardápio", confirmar:"Confirmar e chamar o garçom", volver:"← Voltar", cu:"un.", item:"item", items:"itens", nuevoPedido:"Novo pedido", encuesta:"Como foi sua experiência?", enviarEncuesta:"Enviar opinião", saltarEncuesta:"Pular", graciasEncuesta:"Obrigado! 🙏" },
@@ -222,7 +255,7 @@ const T = {
 
 const NUMERALS = ["I","II","III","IV","V","VI","VII","VIII","IX","X"];
 
-const MENU = [
+const MENU: MenuItem[] = [
   { categoria:"Entradas", nombre:"Ceviche clásico",      descripcion:"Langostinos frescos, limón, cilantro, cebolla roja y ají",            precio:2800, disponible:true, emoji:"🍋", promo:true,  t:{ en:["Classic ceviche","Fresh shrimp, lemon, cilantro, red onion and chili"], pt:["Ceviche clássico","Camarões frescos, limão, coentro, cebola roxa"], it:["Ceviche classico","Gamberi freschi, limone, coriandolo, cipolla rossa"], fr:["Ceviche classique","Crevettes fraîches, citron, coriandre, oignon rouge"], ru:["Классический севиче","Свежие креветки, лимон, кинза, красный лук"] } },
   { categoria:"Entradas", nombre:"Pulpo a la parrilla",   descripcion:"Chimichurri de hierbas frescas y papas al olivo",                     precio:3200, disponible:true, emoji:"🐙", promo:false, t:{ en:["Grilled octopus","Fresh herb chimichurri and olive oil potatoes"], pt:["Polvo grelhado","Chimichurri de ervas frescas e batatas ao azeite"], it:["Polpo alla griglia","Chimichurri alle erbe fresche e patate all'olio"], fr:["Poulpe grillé","Chimichurri aux herbes fraîches et pommes de terre"], ru:["Осьминог на гриле","Чимичурри с травами и картофель с оливками"] } },
   { categoria:"Pescados", nombre:"Merluza al limón",      descripcion:"Filete, manteca de limón, alcaparras y arroz blanco",                 precio:3800, disponible:true, emoji:"🐟", promo:false, t:{ en:["Lemon hake","Fillet, lemon butter, capers and white rice"], pt:["Merluza ao limão","Filé, manteiga de limão, alcaparras e arroz"], it:["Merluzzo al limone","Filetto, burro al limone, capperi e riso"], fr:["Merlu au citron","Filet, beurre citronné, câpres et riz blanc"], ru:["Хек с лимоном","Филе, лимонное масло, каперсы и белый рис"] } },
@@ -235,7 +268,7 @@ const MENU = [
   { categoria:"Postres",  nombre:"Tarta de limón",        descripcion:"Masa sablé, crema de limón y merengue italiano",                      precio:1600, disponible:true, emoji:"🍋", promo:true,  t:{ en:["Lemon tart","Shortcrust pastry, lemon cream and Italian meringue"], pt:["Torta de limão","Massa sablé, creme de limão e merengue italiano"], it:["Crostata al limone","Pasta sablé, crema al limone e meringa italiana"], fr:["Tarte au citron","Pâte sablée, crème au citron et meringue italienne"], ru:["Лимонный тарт","Песочное тесто, лимонный крем и меренга"] } },
 ];
 
-const CAT_T = {
+const CAT_T: Record<string, Record<string, string>> = {
   "Entradas":{en:"Starters",  pt:"Entradas",     it:"Antipasti",      fr:"Entrées",       ru:"Закуски"},
   "Pescados":{en:"Fish",      pt:"Peixes",        it:"Pesci",          fr:"Poissons",      ru:"Рыба"},
   "Mariscos":{en:"Seafood",   pt:"Frutos do mar", it:"Frutti di mare", fr:"Fruits de mer", ru:"Морепродукты"},
@@ -243,34 +276,71 @@ const CAT_T = {
   "Postres": {en:"Desserts",  pt:"Sobremesas",    it:"Dolci",          fr:"Desserts",      ru:"Десерты"},
 };
 
-function formatPeso(n){return "$"+n.toLocaleString("es-AR");}
+function formatPeso(n: number): string { return "$" + n.toLocaleString("es-AR"); }
 
 const STORAGE_KEY = CONFIG.storageKey;
-function loadSurveys(){try{const d=localStorage.getItem(STORAGE_KEY);return d?JSON.parse(d):[];}catch{return[];}}
-function saveSurvey(s){
-  try{const a=loadSurveys();a.push(s);localStorage.setItem(STORAGE_KEY,JSON.stringify(a));}catch{}
-  try{fetch(CONFIG.sheetsUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(s)});}catch{}
+function loadSurveys(): Survey[] { try { const d = localStorage.getItem(STORAGE_KEY); return d ? JSON.parse(d) : []; } catch { return []; } }
+function saveSurvey(s: Survey): void {
+  try { const a = loadSurveys(); a.push(s); localStorage.setItem(STORAGE_KEY, JSON.stringify(a)); } catch {}
+  try { fetch(CONFIG.sheetsUrl, { method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(s) }); } catch {}
 }
 
-function Fireworks(){
-  const p=Array.from({length:12},(_,i)=>i);
-  return(<div style={{position:"relative",height:80,overflow:"visible",marginBottom:8}}>
-    <style>{`${p.map(i=>{const a=(i/12)*360,r=a*(Math.PI/180),x=Math.cos(r)*60,y=Math.sin(r)*60;return`@keyframes b${i}{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(${x}px,${y}px) scale(1.2);opacity:0}}.fw${i}{animation:b${i} 1.2s ease-out ${(i*0.08).toFixed(2)}s infinite;}`;}).join("")}`}</style>
-    {p.map(i=>{const c=[TEAL,SAND,NAVY,"#27ae60","#e74c3c",TEAL2][i%6];const s=i%3===0?10:i%3===1?8:6;return<div key={i} className={`fw${i}`} style={{position:"absolute",left:"calc(50% - 5px)",top:"calc(50% - 5px)",width:s,height:s,borderRadius:"50%",background:c}}/>;})}</div>);
+function Fireworks() {
+  const p = Array.from({length:12}, (_,i) => i);
+  return (
+    <div style={{position:"relative",height:80,overflow:"visible",marginBottom:8}}>
+      <style>{`${p.map(i => { const a=(i/12)*360,r=a*(Math.PI/180),x=Math.cos(r)*60,y=Math.sin(r)*60; return `@keyframes b${i}{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(${x}px,${y}px) scale(1.2);opacity:0}}.fw${i}{animation:b${i} 1.2s ease-out ${(i*0.08).toFixed(2)}s infinite;}`; }).join("")}`}</style>
+      {p.map(i => { const c=[TEAL,SAND,NAVY,"#27ae60","#e74c3c",TEAL2][i%6]; const s=i%3===0?10:i%3===1?8:6; return <div key={i} className={`fw${i}`} style={{position:"absolute",left:"calc(50% - 5px)",top:"calc(50% - 5px)",width:s,height:s,borderRadius:"50%",background:c}}/>; })}
+    </div>
+  );
 }
 
-const ENC_T={titulo:{es:"¿Cómo fue tu experiencia?",en:"How was your experience?",pt:"Como foi sua experiência?",it:"Com'è stata la tua esperienza?",fr:"Comment était votre expérience ?",ru:"Как вам наше меню?"},sub:{es:"Tu opinión nos ayuda a mejorar",en:"Your feedback helps us improve",pt:"Sua opinião nos ajuda a melhorar",it:"La tua opinione ci aiuta a migliorare",fr:"Votre avis nous aide à améliorer",ru:"Ваше мнение помогает нам стать лучше"},q1:{es:"¿Cómo calificás el menú?",en:"How do you rate the menu?",pt:"Como você avalia o cardápio?",it:"Come valuti il menù?",fr:"Comment évaluez-vous le menu ?",ru:"Как вы оцениваете меню?"},q2:{es:"¿El menú en tu idioma fue útil?",en:"Was the menu in your language helpful?",pt:"O cardápio no seu idioma foi útil?",it:"Il menù nella tua lingua è stato utile?",fr:"Le menu dans votre langue était-il utile ?",ru:"Меню на вашем языке было полезным?"},q2a:{es:"🌍 Sí, mucho",en:"🌍 Yes, very much",pt:"🌍 Sim, muito",it:"🌍 Sì, molto",fr:"🌍 Oui, beaucoup",ru:"🌍 Да, очень"},q2b:{es:"🤔 Más o menos",en:"🤔 Somewhat",pt:"🤔 Mais ou menos",it:"🤔 Abbastanza",fr:"🤔 Un peu",ru:"🤔 Частично"},q2c:{es:"❌ No tanto",en:"❌ Not really",pt:"❌ Não muito",it:"❌ Non molto",fr:"❌ Pas vraiment",ru:"❌ Не очень"},q3:{es:"¿Qué tan fácil fue navegar?",en:"How easy was it to navigate?",pt:"Foi fácil navegar?",it:"È stato facile navigare?",fr:"Était-il facile de naviguer ?",ru:"Удобно ли было пользоваться?"},q3a:{es:"😊 Muy fácil",en:"😊 Very easy",pt:"😊 Muito fácil",it:"😊 Molto facile",fr:"😊 Très facile",ru:"😊 Очень удобно"},q3b:{es:"🙂 Normal",en:"🙂 Normal",pt:"🙂 Normal",it:"🙂 Normale",fr:"🙂 Normal",ru:"🙂 Нормально"},q3c:{es:"😕 Me confundí",en:"😕 Got confused",pt:"😕 Me confundi",it:"😕 Mi sono confuso",fr:"😕 Je me suis perdu",ru:"😕 Запутался"},q4:{es:"¿Usarías este menú de nuevo?",en:"Would you use this menu again?",pt:"Usaria este cardápio de novo?",it:"Useresti di nuovo questo menù?",fr:"Utiliseriez-vous ce menu à nouveau ?",ru:"Воспользовались бы снова?"},q4a:{es:"👍 Sí, claro",en:"👍 Yes, definitely",pt:"👍 Sim, claro",it:"👍 Sì, certo",fr:"👍 Oui, bien sûr",ru:"👍 Да, конечно"},q4b:{es:"📄 Prefiero papel",en:"📄 Prefer paper",pt:"📄 Prefiro papel",it:"📄 Preferisco carta",fr:"📄 Je préfère papier",ru:"📄 Предпочитаю бумажное"},q4c:{es:"🤷 Me da igual",en:"🤷 Doesn't matter",pt:"🤷 Tanto faz",it:"🤷 Non importa",fr:"🤷 Peu importe",ru:"🤷 Всё равно"},q5:{es:"Comentario (opcional)",en:"Comment (optional)",pt:"Comentário (opcional)",it:"Commento (opzionale)",fr:"Commentaire (optionnel)",ru:"Комментарий (необязательно)"},enviar:{es:"Enviar opinión",en:"Send feedback",pt:"Enviar opinião",it:"Invia opinione",fr:"Envoyer l'avis",ru:"Отправить отзыв"},saltar:{es:"Saltar",en:"Skip",pt:"Pular",it:"Salta",fr:"Passer",ru:"Пропустить"},gracias:{es:"¡Gracias! 🙏",en:"Thanks! 🙏",pt:"Obrigado! 🙏",it:"Grazie! 🙏",fr:"Merci ! 🙏",ru:"Спасибо! 🙏"}};
-function et(k,l){return ENC_T[k][l]??ENC_T[k].es;}
+const ENC_T: Record<string, Record<string, string>> = {
+  titulo:{es:"¿Cómo fue tu experiencia?",en:"How was your experience?",pt:"Como foi sua experiência?",it:"Com'è stata la tua esperienza?",fr:"Comment était votre expérience ?",ru:"Как вам наше меню?"},
+  sub:{es:"Tu opinión nos ayuda a mejorar",en:"Your feedback helps us improve",pt:"Sua opinião nos ajuda a melhorar",it:"La tua opinione ci aiuta a migliorare",fr:"Votre avis nous aide à améliorer",ru:"Ваше мнение помогает нам стать лучше"},
+  q1:{es:"¿Cómo calificás el menú?",en:"How do you rate the menu?",pt:"Como você avalia o cardápio?",it:"Come valuti il menù?",fr:"Comment évaluez-vous le menu ?",ru:"Как вы оцениваете меню?"},
+  q2:{es:"¿El menú en tu idioma fue útil?",en:"Was the menu in your language helpful?",pt:"O cardápio no seu idioma foi útil?",it:"Il menù nella tua lingua è stato utile?",fr:"Le menu dans votre langue était-il utile ?",ru:"Меню на вашем языке было полезным?"},
+  q2a:{es:"🌍 Sí, mucho",en:"🌍 Yes, very much",pt:"🌍 Sim, muito",it:"🌍 Sì, molto",fr:"🌍 Oui, beaucoup",ru:"🌍 Да, очень"},
+  q2b:{es:"🤔 Más o menos",en:"🤔 Somewhat",pt:"🤔 Mais ou menos",it:"🤔 Abbastanza",fr:"🤔 Un peu",ru:"🤔 Частично"},
+  q2c:{es:"❌ No tanto",en:"❌ Not really",pt:"❌ Não muito",it:"❌ Non molto",fr:"❌ Pas vraiment",ru:"❌ Не очень"},
+  q3:{es:"¿Qué tan fácil fue navegar?",en:"How easy was it to navigate?",pt:"Foi fácil navegar?",it:"È stato facile navigare?",fr:"Était-il facile de naviguer ?",ru:"Удобно ли было пользоваться?"},
+  q3a:{es:"😊 Muy fácil",en:"😊 Very easy",pt:"😊 Muito fácil",it:"😊 Molto facile",fr:"😊 Très facile",ru:"😊 Очень удобно"},
+  q3b:{es:"🙂 Normal",en:"🙂 Normal",pt:"🙂 Normal",it:"🙂 Normale",fr:"🙂 Normal",ru:"🙂 Нормально"},
+  q3c:{es:"😕 Me confundí",en:"😕 Got confused",pt:"😕 Me confundi",it:"😕 Mi sono confuso",fr:"😕 Je me suis perdu",ru:"😕 Запутался"},
+  q4:{es:"¿Usarías este menú de nuevo?",en:"Would you use this menu again?",pt:"Usaria este cardápio de novo?",it:"Useresti di nuovo questo menù?",fr:"Utiliseriez-vous ce menu à nouveau ?",ru:"Воспользовались бы снова?"},
+  q4a:{es:"👍 Sí, claro",en:"👍 Yes, definitely",pt:"👍 Sim, claro",it:"👍 Sì, certo",fr:"👍 Oui, bien sûr",ru:"👍 Да, конечно"},
+  q4b:{es:"📄 Prefiero papel",en:"📄 Prefer paper",pt:"📄 Prefiro papel",it:"📄 Preferisco carta",fr:"📄 Je préfère papier",ru:"📄 Предпочитаю бумажное"},
+  q4c:{es:"🤷 Me da igual",en:"🤷 Doesn't matter",pt:"🤷 Tanto faz",it:"🤷 Non importa",fr:"🤷 Peu importe",ru:"🤷 Всё равно"},
+  q5:{es:"Comentario (opcional)",en:"Comment (optional)",pt:"Comentário (opcional)",it:"Commento (opzionale)",fr:"Commentaire (optionnel)",ru:"Комментарий (необязательно)"},
+  enviar:{es:"Enviar opinión",en:"Send feedback",pt:"Enviar opinião",it:"Invia opinione",fr:"Envoyer l'avis",ru:"Отправить отзыв"},
+  saltar:{es:"Saltar",en:"Skip",pt:"Pular",it:"Salta",fr:"Passer",ru:"Пропустить"},
+  gracias:{es:"¡Gracias! 🙏",en:"Thanks! 🙏",pt:"Obrigado! 🙏",it:"Grazie! 🙏",fr:"Merci ! 🙏",ru:"Спасибо! 🙏"},
+};
+function et(k: string, l: string): string { return ENC_T[k]?.[l] ?? ENC_T[k]?.es ?? ""; }
 
-function Encuesta({lang,onSubmit,onSkip}){
-  const [estrellas,setEstrellas]=useState(0);const[hoverStar,setHoverStar]=useState(0);
-  const[idiomaUtil,setIdiomaUtil]=useState("");const[comodidad,setComodidad]=useState("");
-  const[volveria,setVolveria]=useState("");const[comentario,setComentario]=useState("");
-  const[enviado,setEnviado]=useState(false);
-  function handleSubmit(){const s={estrellas,idioma_util:idiomaUtil,comodidad,volveria,comentario,lang,fecha:new Date().toLocaleString("es-AR")};saveSurvey(s);setEnviado(true);setTimeout(()=>onSubmit(s),1500);}
-  const btnS=(active,col)=>({flex:1,padding:"12px 6px",border:`1px solid ${active?col:BORDER}`,background:active?col:"transparent",color:active?WHITE:MUTED,fontSize:11,cursor:"pointer",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center",gap:4,transition:"all 0.2s",borderRadius:4});
-  if(enviado)return(<div style={{textAlign:"center",padding:"60px 20px",background:CREAM,minHeight:"100vh",fontFamily:"'Jost',sans-serif"}}><style>{FONTS}</style><div style={{fontSize:48,marginBottom:12}}>🐚</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontStyle:"italic",color:TEAL2}}>{et("gracias",lang)}</div></div>);
-  return(
+function Encuesta({ lang, onSubmit, onSkip }: { lang: Lang; onSubmit: (s: Survey) => void; onSkip: () => void }) {
+  const [estrellas, setEstrellas] = useState(0);
+  const [hoverStar, setHoverStar] = useState(0);
+  const [idiomaUtil, setIdiomaUtil] = useState("");
+  const [comodidad, setComodidad] = useState("");
+  const [volveria, setVolveria] = useState("");
+  const [comentario, setComentario] = useState("");
+  const [enviado, setEnviado] = useState(false);
+
+  function handleSubmit() {
+    const s: Survey = { estrellas, idioma_util:idiomaUtil, comodidad, volveria, comentario, lang, fecha:new Date().toLocaleString("es-AR") };
+    saveSurvey(s); setEnviado(true); setTimeout(() => onSubmit(s), 1500);
+  }
+  const btnS = (active: boolean, col: string): CSSProperties => ({ flex:1, padding:"12px 6px", border:`1px solid ${active?col:BORDER}`, background:active?col:"transparent", color:active?WHITE:MUTED, fontSize:11, cursor:"pointer", fontFamily:"inherit", display:"flex", flexDirection:"column", alignItems:"center", gap:4, transition:"all 0.2s", borderRadius:4 });
+
+  if (enviado) return (
+    <div style={{textAlign:"center",padding:"60px 20px",background:CREAM,minHeight:"100vh",fontFamily:"'Jost',sans-serif"}}>
+      <style>{FONTS}</style>
+      <div style={{fontSize:48,marginBottom:12}}>🐚</div>
+      <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontStyle:"italic",color:TEAL2}}>{et("gracias",lang)}</div>
+    </div>
+  );
+  return (
     <div style={{background:CREAM,minHeight:"100vh",fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,paddingBottom:60}}>
       <style>{FONTS}</style>
       <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7}}/>
@@ -281,58 +351,112 @@ function Encuesta({lang,onSubmit,onSkip}){
       <div style={{padding:"24px 20px",display:"flex",flexDirection:"column",gap:14,maxWidth:480,margin:"0 auto"}}>
         <div style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
           <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>{et("q1",lang)}</div>
-          <div style={{display:"flex",justifyContent:"center"}}>{[1,2,3,4,5].map(n=>(<button key={n} onClick={()=>setEstrellas(n)} onMouseEnter={()=>setHoverStar(n)} onMouseLeave={()=>setHoverStar(0)} style={{background:"none",border:"none",cursor:"pointer",fontSize:40,lineHeight:1,transition:"transform 0.15s",transform:(hoverStar||estrellas)>=n?"scale(1.2)":"scale(1)",filter:(hoverStar||estrellas)>=n?"none":"grayscale(1) opacity(0.25)",flex:1,padding:"6px 0",touchAction:"manipulation"}}>⭐</button>))}</div>
+          <div style={{display:"flex",justifyContent:"center"}}>
+            {[1,2,3,4,5].map(n => (
+              <button key={n} onClick={() => setEstrellas(n)} onMouseEnter={() => setHoverStar(n)} onMouseLeave={() => setHoverStar(0)}
+                style={{background:"none",border:"none",cursor:"pointer",fontSize:40,lineHeight:1,transition:"transform 0.15s",transform:(hoverStar||estrellas)>=n?"scale(1.2)":"scale(1)",filter:(hoverStar||estrellas)>=n?"none":"grayscale(1) opacity(0.25)",flex:1,padding:"6px 0",touchAction:"manipulation"}}>⭐</button>
+            ))}
+          </div>
         </div>
-        {[{label:et("q2",lang),state:idiomaUtil,set:setIdiomaUtil,opts:[{id:"si",l:"q2a"},{id:"mas_o_menos",l:"q2b"},{id:"no",l:"q2c"}],col:TEAL2},{label:et("q3",lang),state:comodidad,set:setComodidad,opts:[{id:"muy_facil",l:"q3a"},{id:"normal",l:"q3b"},{id:"confuso",l:"q3c"}],col:"#27ae60"},{label:et("q4",lang),state:volveria,set:setVolveria,opts:[{id:"si",l:"q4a"},{id:"papel",l:"q4b"},{id:"igual",l:"q4c"}],col:NAVY}].map((q,qi)=>(
+        {[
+          {label:et("q2",lang), state:idiomaUtil, set:setIdiomaUtil, opts:[{id:"si",l:"q2a"},{id:"mas_o_menos",l:"q2b"},{id:"no",l:"q2c"}], col:TEAL2},
+          {label:et("q3",lang), state:comodidad,  set:setComodidad,  opts:[{id:"muy_facil",l:"q3a"},{id:"normal",l:"q3b"},{id:"confuso",l:"q3c"}], col:"#27ae60"},
+          {label:et("q4",lang), state:volveria,   set:setVolveria,   opts:[{id:"si",l:"q4a"},{id:"papel",l:"q4b"},{id:"igual",l:"q4c"}], col:NAVY},
+        ].map((q, qi) => (
           <div key={qi} style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
             <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>{q.label}</div>
-            <div style={{display:"flex",gap:8}}>{q.opts.map(op=>(<button key={op.id} onClick={()=>q.set(op.id)} style={btnS(q.state===op.id,q.col)}><span style={{fontSize:18}}>{et(op.l,lang).split(" ")[0]}</span><span style={{fontSize:10}}>{et(op.l,lang).split(" ").slice(1).join(" ")}</span></button>))}</div>
+            <div style={{display:"flex",gap:8}}>
+              {q.opts.map(op => (
+                <button key={op.id} onClick={() => q.set(op.id)} style={btnS(q.state===op.id, q.col)}>
+                  <span style={{fontSize:18}}>{et(op.l,lang).split(" ")[0]}</span>
+                  <span style={{fontSize:10}}>{et(op.l,lang).split(" ").slice(1).join(" ")}</span>
+                </button>
+              ))}
+            </div>
           </div>
         ))}
         <div style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
           <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:10}}>{et("q5",lang)}</div>
-          <textarea value={comentario} onChange={e=>setComentario(e.target.value)} placeholder="..." rows={3} style={{width:"100%",padding:"12px",background:CREAM,border:`1px solid ${BORDER}`,color:NAVY,fontSize:13,fontFamily:"inherit",resize:"none",outline:"none",boxSizing:"border-box"}}/>
+          <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder="..." rows={3}
+            style={{width:"100%",padding:"12px",background:CREAM,border:`1px solid ${BORDER}`,color:NAVY,fontSize:13,fontFamily:"inherit",resize:"none",outline:"none",boxSizing:"border-box"}}/>
         </div>
-        <button onClick={handleSubmit} disabled={estrellas===0} style={{width:"100%",padding:"15px",background:estrellas>0?TEAL2:"#ccc",color:WHITE,border:"none",fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:estrellas>0?"pointer":"not-allowed",fontFamily:"inherit"}}>{et("enviar",lang)}</button>
-        <button onClick={onSkip} style={{width:"100%",padding:"12px",background:"transparent",color:MUTED,border:`1px solid ${BORDER}`,fontSize:10,letterSpacing:2,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{et("saltar",lang)}</button>
+        <button onClick={handleSubmit} disabled={estrellas===0}
+          style={{width:"100%",padding:"15px",background:estrellas>0?TEAL2:"#ccc",color:WHITE,border:"none",fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:estrellas>0?"pointer":"not-allowed",fontFamily:"inherit"}}>
+          {et("enviar",lang)}
+        </button>
+        <button onClick={onSkip}
+          style={{width:"100%",padding:"12px",background:"transparent",color:MUTED,border:`1px solid ${BORDER}`,fontSize:10,letterSpacing:2,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>
+          {et("saltar",lang)}
+        </button>
       </div>
     </div>
   );
 }
 
-function AdminPanel({onClose}){
-  const surveys=loadSurveys();const total=surveys.length;
-  const avg=total>0?(surveys.reduce((s,x)=>s+x.estrellas,0)/total).toFixed(1):"—";
-  const stars=[1,2,3,4,5].map(n=>({n,count:surveys.filter(s=>s.estrellas===n).length}));
-  const langs=(["es","en","pt","it","fr","ru"]).map(l=>({l,count:surveys.filter(s=>s.lang===l).length,flag:T[l].flag}));
-  const comments=surveys.filter(s=>s.comentario?.trim().length>0);
-  return(
+function AdminPanel({ onClose }: { onClose: () => void }) {
+  const surveys = loadSurveys();
+  const total = surveys.length;
+  const avg = total > 0 ? (surveys.reduce((s,x) => s+x.estrellas, 0)/total).toFixed(1) : "—";
+  const stars = [1,2,3,4,5].map(n => ({ n, count:surveys.filter(s => s.estrellas===n).length }));
+  const langs = (["es","en","pt","it","fr","ru"] as Lang[]).map(l => ({ l, count:surveys.filter(s => s.lang===l).length, flag:T[l].flag }));
+  const comments = surveys.filter(s => s.comentario?.trim().length > 0);
+  return (
     <div style={{minHeight:"100vh",background:CREAM,fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,paddingBottom:40}}>
       <style>{FONTS}</style>
       <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7}}/>
       <div style={{background:WHITE,borderBottom:`1px solid ${BORDER}`,padding:"20px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div><div style={{fontSize:9,letterSpacing:4,color:MUTED,textTransform:"uppercase",marginBottom:4}}>Panel privado</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:NAVY}}>⚓ Resultados</div></div>
+        <div>
+          <div style={{fontSize:9,letterSpacing:4,color:MUTED,textTransform:"uppercase",marginBottom:4}}>Panel privado</div>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:NAVY}}>⚓ Resultados</div>
+        </div>
         <button onClick={onClose} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"7px 16px",cursor:"pointer",fontFamily:"inherit",fontSize:10,letterSpacing:2}}>✕ CERRAR</button>
       </div>
       <div style={{padding:"20px",display:"flex",flexDirection:"column",gap:12,maxWidth:480,margin:"0 auto"}}>
-        {total===0?(<div style={{textAlign:"center",padding:"60px 20px",color:MUTED}}><div style={{fontSize:40}}>📭</div><div style={{marginTop:12,fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic"}}>Sin respuestas aún</div></div>):(
-          <><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-            <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>{total}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Respuestas</div></div>
-            <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>⭐{avg}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Promedio</div></div>
+        {total === 0 ? (
+          <div style={{textAlign:"center",padding:"60px 20px",color:MUTED}}>
+            <div style={{fontSize:40}}>📭</div>
+            <div style={{marginTop:12,fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic"}}>Sin respuestas aún</div>
           </div>
-          <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-            <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Distribución de estrellas</div>
-            {[...stars].reverse().map(({n,count})=>(<div key={n} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><span style={{fontSize:11,color:MUTED,minWidth:20}}>{n}★</span><div style={{flex:1,height:6,background:CREAM,overflow:"hidden"}}><div style={{height:"100%",width:total>0?`${(count/total)*100}%`:"0%",background:n>=4?SAND:TEAL,transition:"width 0.5s"}}/></div><span style={{fontSize:11,color:NAVY,minWidth:20,textAlign:"right"}}>{count}</span></div>))}
-          </div>
-          <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-            <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Idiomas</div>
-            <div style={{display:"flex",gap:14,justifyContent:"center"}}>{langs.filter(l=>l.count>0).map(l=>(<div key={l.l} style={{textAlign:"center"}}><div style={{fontSize:24}}>{l.flag}</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:TEAL2}}>{l.count}</div></div>))}</div>
-          </div>
-          {comments.length>0&&<div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-            <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Comentarios recientes</div>
-            {comments.slice(-5).reverse().map((s,i)=>(<div key={i} style={{borderBottom:`1px solid ${BORDER}`,padding:"10px 0"}}><div style={{fontSize:10,color:MUTED,marginBottom:4}}>{s.fecha} · {T[s.lang]?.flag} · {"⭐".repeat(s.estrellas)}</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,fontStyle:"italic",color:NAVY}}>{s.comentario}</div></div>))}
-          </div>}
-          <button onClick={()=>{if(confirm("¿Borrar todos los datos?")){localStorage.removeItem(STORAGE_KEY);onClose();}}} style={{width:"100%",padding:"12px",background:"transparent",color:"#c0392b",border:"1px solid rgba(192,57,43,0.3)",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>🗑️ Borrar todos los datos</button></>
+        ) : (
+          <>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>{total}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Respuestas</div></div>
+              <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>⭐{avg}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Promedio</div></div>
+            </div>
+            <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
+              <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Distribución de estrellas</div>
+              {[...stars].reverse().map(({n,count}) => (
+                <div key={n} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                  <span style={{fontSize:11,color:MUTED,minWidth:20}}>{n}★</span>
+                  <div style={{flex:1,height:6,background:CREAM,overflow:"hidden"}}><div style={{height:"100%",width:total>0?`${(count/total)*100}%`:"0%",background:n>=4?SAND:TEAL,transition:"width 0.5s"}}/></div>
+                  <span style={{fontSize:11,color:NAVY,minWidth:20,textAlign:"right"}}>{count}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
+              <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Idiomas</div>
+              <div style={{display:"flex",gap:14,justifyContent:"center"}}>
+                {langs.filter(l => l.count > 0).map(l => (
+                  <div key={l.l} style={{textAlign:"center"}}><div style={{fontSize:24}}>{l.flag}</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:TEAL2}}>{l.count}</div></div>
+                ))}
+              </div>
+            </div>
+            {comments.length > 0 && (
+              <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
+                <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Comentarios recientes</div>
+                {comments.slice(-5).reverse().map((s,i) => (
+                  <div key={i} style={{borderBottom:`1px solid ${BORDER}`,padding:"10px 0"}}>
+                    <div style={{fontSize:10,color:MUTED,marginBottom:4}}>{s.fecha} · {T[s.lang as Lang]?.flag} · {"⭐".repeat(s.estrellas)}</div>
+                    <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,fontStyle:"italic",color:NAVY}}>{s.comentario}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button onClick={() => { if (confirm("¿Borrar todos los datos?")) { localStorage.removeItem(STORAGE_KEY); onClose(); } }}
+              style={{width:"100%",padding:"12px",background:"transparent",color:"#c0392b",border:"1px solid rgba(192,57,43,0.3)",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>
+              🗑️ Borrar todos los datos
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -340,46 +464,64 @@ function AdminPanel({onClose}){
 }
 
 // ===================== APP =====================
-export default function App(){
-  const[lang,setLang]=useState("es");
-  const[langSelected,setLangSelected]=useState(false);
-  const[langAnim,setLangAnim]=useState(false);
-  const[activeCategory,setActiveCategory]=useState("all");
-  const[carrito,setCarrito]=useState([]);
-  const[showCarrito,setShowCarrito]=useState(false);
-  const[pedidoEnviado,setPedidoEnviado]=useState(false);
-  const[showCheck,setShowCheck]=useState(false);
-  const[showEncuesta,setShowEncuesta]=useState(false);
-  const[showAdmin,setShowAdmin]=useState(false);
-  const[adminTaps,setAdminTaps]=useState(0);
-  const[loaded,setLoaded]=useState(false);
+export default function App() {
+  const [lang, setLang] = useState<Lang>("es");
+  const [langSelected, setLangSelected] = useState(false);
+  const [langAnim, setLangAnim] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [carrito, setCarrito] = useState<CartItem[]>([]);
+  const [showCarrito, setShowCarrito] = useState(false);
+  const [pedidoEnviado, setPedidoEnviado] = useState(false);
+  const [showCheck, setShowCheck] = useState(false);
+  const [showEncuesta, setShowEncuesta] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminTaps, setAdminTaps] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
-  useEffect(()=>{setTimeout(()=>setLoaded(true),150);},[]);
-  useEffect(()=>{if(pedidoEnviado)setTimeout(()=>setShowCheck(true),100);else setShowCheck(false);},[pedidoEnviado]);
+  useEffect(() => { setTimeout(() => setLoaded(true), 150); }, []);
+  useEffect(() => { if (pedidoEnviado) setTimeout(() => setShowCheck(true), 100); else setShowCheck(false); }, [pedidoEnviado]);
 
-  function chooseLang(l){setLang(l);setLangAnim(true);setTimeout(()=>{setLangSelected(true);window.scrollTo(0,0);},500);}
-  function handleFooterTap(){const n=adminTaps+1;setAdminTaps(n);if(n>=5){setShowAdmin(true);setAdminTaps(0);}}
+  function chooseLang(l: Lang) { setLang(l); setLangAnim(true); setTimeout(() => { setLangSelected(true); window.scrollTo(0,0); }, 500); }
+  function handleFooterTap() { const n = adminTaps+1; setAdminTaps(n); if (n >= 5) { setShowAdmin(true); setAdminTaps(0); } }
 
-  const t=T[lang];
-  const totalItems=carrito.reduce((s,i)=>s+i.cantidad,0);
-  const totalPrecio=carrito.reduce((s,i)=>s+i.precio*i.cantidad,0);
+  const t = T[lang];
+  const totalItems = carrito.reduce((s,i) => s+i.cantidad, 0);
+  const totalPrecio = carrito.reduce((s,i) => s+i.precio*i.cantidad, 0);
 
-  function getNombre(item){if(lang==="es")return item.nombre;return item.t?.[lang]?.[0]??item.nombre;}
-  function getDesc(item){if(lang==="es")return item.descripcion;return item.t?.[lang]?.[1]??item.descripcion;}
-  function getCat(cat){return cat==="all"?t.todo:(CAT_T[cat]?.[lang]??cat);}
-  function getCartNombre(item){if(lang==="es")return item.nombre;return item.t?.[lang]?.[0]??item.nombre;}
-  function agregarItem(item){setCarrito(prev=>{const e=prev.find(c=>c.nombre===item.nombre);if(e)return prev.map(c=>c.nombre===item.nombre?{...c,cantidad:c.cantidad+1}:c);return[...prev,{nombre:item.nombre,emoji:item.emoji,precio:item.precio,cantidad:1,t:item.t}];});}
-  function quitarItem(nombre){setCarrito(prev=>{const e=prev.find(c=>c.nombre===nombre);if(e&&e.cantidad>1)return prev.map(c=>c.nombre===nombre?{...c,cantidad:c.cantidad-1}:c);return prev.filter(c=>c.nombre!==nombre);});}
-  function cantidadEnCarrito(nombre){return carrito.find(c=>c.nombre===nombre)?.cantidad||0;}
-  function nuevosPedido(){setCarrito([]);setPedidoEnviado(false);setShowCarrito(false);setShowEncuesta(false);}
+  function getNombre(item: MenuItem): string { if (lang==="es") return item.nombre; return item.t?.[lang]?.[0] ?? item.nombre; }
+  function getDesc(item: MenuItem): string { if (lang==="es") return item.descripcion; return item.t?.[lang]?.[1] ?? item.descripcion; }
+  function getCat(cat: string): string { return cat==="all" ? t.todo : (CAT_T[cat]?.[lang] ?? cat); }
+  function getCartNombre(item: CartItem): string { if (lang==="es") return item.nombre; return item.t?.[lang]?.[0] ?? item.nombre; }
 
-  const categories=["all",...Array.from(new Set(MENU.map(i=>i.categoria)))];
-  const filtered=activeCategory==="all"?MENU:MENU.filter(i=>i.categoria===activeCategory);
-  const grouped=filtered.reduce((acc,item)=>{if(!acc[item.categoria])acc[item.categoria]=[];acc[item.categoria].push(item);return acc;},{});
+  function agregarItem(item: MenuItem) {
+    setCarrito(prev => {
+      const e = prev.find(c => c.nombre===item.nombre);
+      if (e) return prev.map(c => c.nombre===item.nombre ? {...c, cantidad:c.cantidad+1} : c);
+      return [...prev, {nombre:item.nombre, emoji:item.emoji, precio:item.precio, cantidad:1, t:item.t}];
+    });
+  }
+  function quitarItem(nombre: string) {
+    setCarrito(prev => {
+      const e = prev.find(c => c.nombre===nombre);
+      if (e && e.cantidad > 1) return prev.map(c => c.nombre===nombre ? {...c, cantidad:c.cantidad-1} : c);
+      return prev.filter(c => c.nombre!==nombre);
+    });
+  }
+  function cantidadEnCarrito(nombre: string): number { return carrito.find(c => c.nombre===nombre)?.cantidad || 0; }
+  function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); setShowEncuesta(false); }
 
-  if(!langSelected){
-    const LANGS=[["es","🇪🇸","Bienvenido"],["en","🇬🇧","Welcome"],["pt","🇧🇷","Bem-vindo"],["it","🇮🇹","Benvenuto"],["fr","🇫🇷","Bienvenue"],["ru","🇷🇺","Добро пожаловать"]];
-    return(
+  const categories = ["all", ...Array.from(new Set(MENU.map(i => i.categoria)))];
+  const filtered = activeCategory==="all" ? MENU : MENU.filter(i => i.categoria===activeCategory);
+  const grouped = filtered.reduce((acc: Record<string, MenuItem[]>, item) => {
+    if (!acc[item.categoria]) acc[item.categoria] = [];
+    acc[item.categoria].push(item);
+    return acc;
+  }, {});
+
+  // ── PANTALLA IDIOMA ──
+  if (!langSelected) {
+    const LANGS: [Lang, string, string][] = [["es","🇪🇸","Bienvenido"],["en","🇬🇧","Welcome"],["pt","🇧🇷","Bem-vindo"],["it","🇮🇹","Benvenuto"],["fr","🇫🇷","Bienvenue"],["ru","🇷🇺","Добро пожаловать"]];
+    return (
       <div style={{position:"fixed",inset:0,background:CREAM,fontFamily:"'Jost',sans-serif",fontWeight:300,overflow:"hidden",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 24px"}}>
         <style>{`${FONTS} @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
         <SeafoodSketchBg opacity={0.22}/>
@@ -400,8 +542,9 @@ export default function App(){
           <div style={{fontSize:9,letterSpacing:4,color:MUTED,textTransform:"uppercase"}}>Elegí tu idioma · Choose your language</div>
         </div>
         <div style={{position:"relative",zIndex:1,width:"100%",maxWidth:360,display:"flex",flexDirection:"column",gap:8,opacity:langAnim?0:1,transition:"opacity 0.4s"}}>
-          {LANGS.map(([code,flag,sub],i)=>(
-            <button key={code} onClick={()=>chooseLang(code)} style={{width:"100%",padding:"13px 20px",background:"rgba(247,244,238,0.88)",backdropFilter:"blur(8px)",border:`1px solid ${BORDER}`,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:14,animation:`fadeInUp 0.5s ease ${i*0.07}s both`,boxShadow:`0 1px 8px ${BORDER}`}}>
+          {LANGS.map(([code,flag,sub],i) => (
+            <button key={code} onClick={() => chooseLang(code)}
+              style={{width:"100%",padding:"13px 20px",background:"rgba(247,244,238,0.88)",backdropFilter:"blur(8px)",border:`1px solid ${BORDER}`,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:14,animation:`fadeInUp 0.5s ease ${i*0.07}s both`,boxShadow:`0 1px 8px ${BORDER}`}}>
               <span style={{fontSize:26,lineHeight:1,flexShrink:0}}>{flag}</span>
               <div style={{textAlign:"left",flex:1}}>
                 <div style={{fontSize:14,fontWeight:400,color:NAVY,letterSpacing:0.5}}>{T[code].langName}</div>
@@ -416,22 +559,27 @@ export default function App(){
     );
   }
 
-  if(showAdmin) return <AdminPanel onClose={()=>setShowAdmin(false)}/>;
+  if (showAdmin) return <AdminPanel onClose={() => setShowAdmin(false)}/>;
 
-  if(showCarrito){
-    if(showEncuesta) return(<div style={{background:CREAM,minHeight:"100vh",width:"100%"}}><Encuesta lang={lang} onSubmit={()=>{setShowEncuesta(false);nuevosPedido();}} onSkip={()=>{setShowEncuesta(false);nuevosPedido();}}/></div>);
-    return(
+  // ── CARRITO ──
+  if (showCarrito) {
+    if (showEncuesta) return (
+      <div style={{background:CREAM,minHeight:"100vh",width:"100%"}}>
+        <Encuesta lang={lang} onSubmit={() => { setShowEncuesta(false); nuevosPedido(); }} onSkip={() => { setShowEncuesta(false); nuevosPedido(); }}/>
+      </div>
+    );
+    return (
       <div style={{background:CREAM,minHeight:"100vh",width:"100%",fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,display:"flex",flexDirection:"column"}}>
         <style>{FONTS}</style>
         <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7,flexShrink:0}}/>
         <div style={{background:WHITE,borderBottom:`1px solid ${BORDER}`,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0}}>
-          <button onClick={()=>setShowCarrito(false)} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"6px 14px",cursor:"pointer",fontFamily:"inherit",fontSize:9,letterSpacing:2,textTransform:"uppercase"}}>{t.volver}</button>
+          <button onClick={() => setShowCarrito(false)} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"6px 14px",cursor:"pointer",fontFamily:"inherit",fontSize:9,letterSpacing:2,textTransform:"uppercase"}}>{t.volver}</button>
           <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic",color:NAVY}}>{t.tuPedido}</div>
           <div style={{width:80}}/>
         </div>
-        {pedidoEnviado?(
+        {pedidoEnviado ? (
           <div style={{padding:"40px 20px",textAlign:"center",flex:1}}>
-            {showCheck&&<Fireworks/>}
+            {showCheck && <Fireworks/>}
             <div style={{fontSize:52,margin:"16px 0"}}>🎉</div>
             <div style={{background:WHITE,padding:"20px",margin:"20px 0",border:`1px solid rgba(74,143,168,0.25)`}}>
               <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic",color:TEAL2,marginBottom:6}}>{t.mostrarMozo}</div>
@@ -439,35 +587,54 @@ export default function App(){
             </div>
             <div style={{background:WHITE,padding:"16px",marginBottom:16,border:`1px solid ${BORDER}`,textAlign:"left"}}>
               <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>📋 Detalle del pedido</div>
-              {carrito.map((item,i)=>(<div key={i} style={{display:"flex",alignItems:"baseline",gap:8,padding:"8px 0",borderBottom:`1px solid ${BORDER}`}}><span style={{fontSize:13,color:NAVY,flex:1}}>{item.nombre} ×{item.cantidad}</span><div style={{flex:1,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/><span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,fontWeight:600,color:TEAL2,flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span></div>))}
-              <div style={{display:"flex",alignItems:"baseline",gap:8,marginTop:12,paddingTop:10,borderTop:`1px solid ${TEAL}30`}}><span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1}}>TOTAL</span><div style={{flex:1,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/><span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,color:TEAL2}}>{formatPeso(totalPrecio)}</span></div>
+              {carrito.map((item,i) => (
+                <div key={i} style={{display:"flex",alignItems:"baseline",gap:8,padding:"8px 0",borderBottom:`1px solid ${BORDER}`}}>
+                  <span style={{fontSize:13,color:NAVY,flex:1}}>{item.nombre} ×{item.cantidad}</span>
+                  <div style={{flex:1,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
+                  <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,fontWeight:600,color:TEAL2,flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
+                </div>
+              ))}
+              <div style={{display:"flex",alignItems:"baseline",gap:8,marginTop:12,paddingTop:10,borderTop:`1px solid ${TEAL}30`}}>
+                <span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1}}>TOTAL</span>
+                <div style={{flex:1,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
+                <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
+              </div>
             </div>
-            <button onClick={()=>setShowEncuesta(true)} style={{width:"100%",padding:"14px",background:TEAL2,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>💬 {t.encuesta}</button>
+            <button onClick={() => setShowEncuesta(true)} style={{width:"100%",padding:"14px",background:TEAL2,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>💬 {t.encuesta}</button>
             <button onClick={nuevosPedido} style={{width:"100%",padding:"12px",background:"transparent",color:MUTED,border:`1px solid ${BORDER}`,fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.nuevoPedido}</button>
           </div>
-        ):(
+        ) : (
           <div style={{padding:"20px",flex:1}}>
             <div style={{fontSize:9,letterSpacing:2,color:MUTED,textTransform:"uppercase",marginBottom:20}}>{t.revisaPedido}</div>
-            {carrito.length===0?(
+            {carrito.length === 0 ? (
               <div style={{textAlign:"center",padding:"60px 20px",color:MUTED}}>
                 <div style={{fontSize:40}}>🐚</div>
                 <div style={{marginTop:12,fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:NAVY}}>{t.carritoVacio}</div>
-                <button onClick={()=>setShowCarrito(false)} style={{marginTop:20,padding:"10px 28px",background:TEAL2,color:WHITE,border:"none",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.verMenu}</button>
+                <button onClick={() => setShowCarrito(false)} style={{marginTop:20,padding:"10px 28px",background:TEAL2,color:WHITE,border:"none",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.verMenu}</button>
               </div>
-            ):(
+            ) : (
               <>
-                {carrito.map((item,idx)=>(<div key={idx} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:`1px solid ${BORDER}`}}>
-                  <span style={{fontSize:20}}>{item.emoji}</span>
-                  <div style={{flex:1,minWidth:0}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:NAVY}}>{getCartNombre(item)}</div><div style={{fontSize:11,color:MUTED,marginTop:1}}>{formatPeso(item.precio)} {t.cu}</div></div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <button onClick={()=>quitarItem(item.nombre)} style={{width:26,height:26,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                    <span style={{fontSize:13,color:NAVY,minWidth:16,textAlign:"center"}}>{item.cantidad}</span>
-                    <button onClick={()=>agregarItem(item)} style={{width:26,height:26,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                {carrito.map((item,idx) => (
+                  <div key={idx} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:`1px solid ${BORDER}`}}>
+                    <span style={{fontSize:20}}>{item.emoji}</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:NAVY}}>{getCartNombre(item)}</div>
+                      <div style={{fontSize:11,color:MUTED,marginTop:1}}>{formatPeso(item.precio)} {t.cu}</div>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <button onClick={() => quitarItem(item.nombre)} style={{width:26,height:26,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                      <span style={{fontSize:13,color:NAVY,minWidth:16,textAlign:"center"}}>{item.cantidad}</span>
+                      <button onClick={() => agregarItem(item as unknown as MenuItem)} style={{width:26,height:26,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                    </div>
+                    <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
                   </div>
-                  <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
-                </div>))}
-                <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"16px 0",borderTop:`1px solid ${TEAL}30`,marginTop:8}}><span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1}}>TOTAL</span><div style={{flex:2,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/><span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:TEAL2}}>{formatPeso(totalPrecio)}</span></div>
-                <button onClick={()=>setPedidoEnviado(true)} style={{width:"100%",padding:"15px",background:TEAL2,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginTop:8}}>📋 {t.confirmar}</button>
+                ))}
+                <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"16px 0",borderTop:`1px solid ${TEAL}30`,marginTop:8}}>
+                  <span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1}}>TOTAL</span>
+                  <div style={{flex:2,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
+                  <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
+                </div>
+                <button onClick={() => setPedidoEnviado(true)} style={{width:"100%",padding:"15px",background:TEAL2,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginTop:8}}>📋 {t.confirmar}</button>
               </>
             )}
           </div>
@@ -479,13 +646,13 @@ export default function App(){
   // ── MENÚ PRINCIPAL ──
   let creatureCounter = 0;
 
-  return(
+  return (
     <div style={{background:CREAM,fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,minHeight:"100vh",maxWidth:480,margin:"0 auto",overflowX:"hidden",width:"100%"}}>
       <style>{`${FONTS}*{box-sizing:border-box;margin:0;padding:0;}::-webkit-scrollbar{display:none;}html,body,#root{overflow-x:hidden;width:100%;}`}</style>
       <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7}}/>
 
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 16px",background:WHITE,borderBottom:`1px solid ${BORDER}`}}>
-        <button onClick={()=>setLangSelected(false)} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"5px 12px",cursor:"pointer",fontFamily:"inherit",fontSize:10,display:"flex",alignItems:"center",gap:6,letterSpacing:0.5}}>
+        <button onClick={() => setLangSelected(false)} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"5px 12px",cursor:"pointer",fontFamily:"inherit",fontSize:10,display:"flex",alignItems:"center",gap:6,letterSpacing:0.5}}>
           <span>{T[lang].flag}</span><span>{T[lang].langName}</span>
         </button>
         <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:13,fontStyle:"italic",color:MUTED,letterSpacing:1}}>⚓</div>
@@ -506,52 +673,56 @@ export default function App(){
       </div>
 
       <nav style={{position:"sticky",top:0,zIndex:50,background:"rgba(247,244,238,0.97)",backdropFilter:"blur(12px)",borderBottom:`1px solid ${BORDER}`,display:"flex",overflowX:"auto",scrollbarWidth:"none",padding:"0 4px"}}>
-        {categories.map((cat,ci)=>{
-          const active=activeCategory===cat;
-          const label=cat==="all"?t.todo:(`${NUMERALS[(ci-1)%NUMERALS.length]} · ${getCat(cat)}`);
-          return(<button key={cat} onClick={()=>setActiveCategory(cat)} style={{flexShrink:0,fontFamily:"'Jost',sans-serif",fontSize:9,fontWeight:500,letterSpacing:2.5,textTransform:"uppercase",color:active?NAVY:MUTED,padding:"0 16px",height:44,background:"none",border:"none",borderBottom:`2px solid ${active?TEAL:"transparent"}`,cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.2s"}}>{label}</button>);
+        {categories.map((cat,ci) => {
+          const active = activeCategory===cat;
+          const label = cat==="all" ? t.todo : (`${NUMERALS[(ci-1)%NUMERALS.length]} · ${getCat(cat)}`);
+          return (
+            <button key={cat} onClick={() => setActiveCategory(cat)}
+              style={{flexShrink:0,fontFamily:"'Jost',sans-serif",fontSize:9,fontWeight:500,letterSpacing:2.5,textTransform:"uppercase",color:active?NAVY:MUTED,padding:"0 16px",height:44,background:"none",border:"none",borderBottom:`2px solid ${active?TEAL:"transparent"}`,cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.2s"}}>
+              {label}
+            </button>
+          );
         })}
       </nav>
 
       <div style={{paddingBottom:100}}>
-        {Object.entries(grouped).map(([cat,catItems],gi)=>{
-          const catIndex=categories.indexOf(cat)-1;
-          return(
+        {Object.entries(grouped).map(([cat, catItems], gi) => {
+          const catIndex = categories.indexOf(cat) - 1;
+          return (
             <div key={cat} style={{opacity:loaded?1:0,transform:loaded?"translateY(0)":"translateY(12px)",transition:`all 0.5s ease ${gi*0.08}s`}}>
               <div style={{display:"flex",alignItems:"flex-end",gap:12,padding:"28px 20px 12px",borderBottom:`1px solid ${BORDER}`}}>
                 <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:13,fontStyle:"italic",color:SAND,letterSpacing:1,paddingBottom:3}}>{NUMERALS[catIndex%NUMERALS.length]}.</div>
                 <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:32,fontWeight:300,fontStyle:"italic",color:NAVY,lineHeight:1,flex:1}}>{getCat(cat)}</div>
                 <div style={{fontSize:9,letterSpacing:3,textTransform:"uppercase",color:MUTED,paddingBottom:4}}>{cat==="all"?"All":(CAT_T[cat]?.en??cat)}</div>
               </div>
-
               <div style={{padding:"0 20px"}}>
-                {catItems.map((item,idx)=>{
-                  const cant=cantidadEnCarrito(item.nombre);
-                  const isLast=idx===catItems.length-1;
-                  const ci=creatureCounter++;
-                  return(
+                {catItems.map((item, idx) => {
+                  const cant = cantidadEnCarrito(item.nombre);
+                  const isLast = idx === catItems.length - 1;
+                  const ci = creatureCounter++;
+                  return (
                     <div key={idx}>
                       <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"13px 0",borderBottom:isLast?`1px solid ${BORDER}`:"none"}}>
                         <div style={{flex:1,minWidth:0}}>
-                          {item.promo&&<div style={{fontSize:7.5,fontWeight:500,letterSpacing:2,textTransform:"uppercase",color:SAND,border:`1px solid rgba(197,169,107,0.4)`,display:"inline-block",padding:"1px 6px",marginBottom:4}}>{t.oferta}</div>}
+                          {item.promo && <div style={{fontSize:7.5,fontWeight:500,letterSpacing:2,textTransform:"uppercase",color:SAND,border:`1px solid rgba(197,169,107,0.4)`,display:"inline-block",padding:"1px 6px",marginBottom:4}}>{t.oferta}</div>}
                           <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,fontWeight:item.promo?400:300,fontStyle:item.promo?"italic":"normal",color:NAVY,lineHeight:1.2,marginBottom:3}}>{getNombre(item)}</div>
-                          {getDesc(item)?<div style={{fontSize:11,fontWeight:300,color:MUTED,lineHeight:1.6,letterSpacing:0.3}}>{getDesc(item)}</div>:null}
+                          {getDesc(item) ? <div style={{fontSize:11,fontWeight:300,color:MUTED,lineHeight:1.6,letterSpacing:0.3}}>{getDesc(item)}</div> : null}
                         </div>
                         <div style={{flex:1,minWidth:20,borderBottom:`1px dotted rgba(26,46,59,0.15)`,marginBottom:5,alignSelf:"flex-end"}}/>
                         <div style={{display:"flex",alignItems:"baseline",gap:10,flexShrink:0}}>
                           <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,fontWeight:item.promo?600:400,color:item.promo?SAND:TEAL2,whiteSpace:"nowrap"}}>{formatPeso(item.precio)}</div>
-                          {item.disponible&&(cant===0?(
-                            <button onClick={()=>agregarItem(item)} style={{width:24,height:24,border:`1px solid ${TEAL}`,background:"transparent",color:TEAL,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>+</button>
-                          ):(
+                          {item.disponible && (cant === 0 ? (
+                            <button onClick={() => agregarItem(item)} style={{width:24,height:24,border:`1px solid ${TEAL}`,background:"transparent",color:TEAL,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>+</button>
+                          ) : (
                             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0}}>
-                              <button onClick={()=>quitarItem(item.nombre)} style={{width:22,height:22,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                              <button onClick={() => quitarItem(item.nombre)} style={{width:22,height:22,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
                               <span style={{fontSize:12,color:NAVY,minWidth:12,textAlign:"center"}}>{cant}</span>
-                              <button onClick={()=>agregarItem(item)} style={{width:22,height:22,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                              <button onClick={() => agregarItem(item)} style={{width:22,height:22,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
                             </div>
                           ))}
                         </div>
                       </div>
-                      {!isLast&&<CreatureDivider index={ci}/>}
+                      {!isLast && <CreatureDivider index={ci}/>}
                     </div>
                   );
                 })}
@@ -564,9 +735,9 @@ export default function App(){
         <footer onClick={handleFooterTap} style={{margin:"28px 20px 0",paddingTop:24,borderTop:`1px solid ${BORDER}`,textAlign:"center",cursor:"default"}}>
           <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic",color:MUTED,marginBottom:14}}>{CONFIG.nombre}</div>
           <div style={{display:"flex",justifyContent:"center",gap:20,marginBottom:12}}>
-            {CONFIG.pagoEfectivo&&<span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>💵 {t.efectivo}</span>}
-            {CONFIG.pagoMercadoPago&&<span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>📱 Mercado Pago</span>}
-            {CONFIG.pagoTarjeta&&<span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>💳 {t.tarjeta}</span>}
+            {CONFIG.pagoEfectivo && <span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>💵 {t.efectivo}</span>}
+            {CONFIG.pagoMercadoPago && <span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>📱 Mercado Pago</span>}
+            {CONFIG.pagoTarjeta && <span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>💳 {t.tarjeta}</span>}
           </div>
           <div style={{fontSize:9,color:MUTED,opacity:0.7,letterSpacing:1,marginBottom:14}}>{t.precios}</div>
           <div style={{margin:"0 auto",width:"100%",maxWidth:280}}>
@@ -577,9 +748,10 @@ export default function App(){
         </footer>
       </div>
 
-      {totalItems>0&&(
+      {totalItems > 0 && (
         <div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:100,width:"calc(100% - 32px)",maxWidth:448}}>
-          <button onClick={()=>setShowCarrito(true)} style={{width:"100%",padding:"15px 20px",background:NAVY,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:`0 8px 32px ${NAVY}55`}}>
+          <button onClick={() => setShowCarrito(true)}
+            style={{width:"100%",padding:"15px 20px",background:NAVY,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",display:"flex",justifyContent:"space-between",alignItems:"center",boxShadow:`0 8px 32px ${NAVY}55`}}>
             <span>🐚 {totalItems} {totalItems===1?t.item:t.items}</span>
             <span style={{opacity:0.7}}>{t.verPedido}</span>
             <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16}}>{formatPeso(totalPrecio)}</span>
