@@ -656,19 +656,21 @@ export default function App() {
                   const cant = cantidadEnCarrito(item.nombre);
                   const isLast = idx === catItems.length - 1;
                   return (
-                    <div key={idx} style={{display:"flex",alignItems:"baseline",gap:10,padding:"16px 0",borderBottom:isLast?"none":`1px solid ${BORDER}`}}>
-                      {item.imagen && (
-                        <img src={item.imagen} alt={getNombre(item)} width={56} height={56}
-                          style={{width:56,height:56,borderRadius:10,objectFit:"cover",flexShrink:0,alignSelf:"center",border:`1px solid ${BORDER}`}}/>
-                      )}
-                      <div style={{flex:1,minWidth:0}}>
-                        {item.promo && <div style={{fontSize:8.5,fontWeight:500,letterSpacing:2,textTransform:"uppercase",color:SAND,border:`1px solid rgba(199,154,86,0.5)`,display:"inline-block",padding:"2px 7px",marginBottom:5}}>{t.oferta}</div>}
-                        <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:27,fontWeight:item.promo?400:300,fontStyle:item.promo?"italic":"normal",color:NAVY,lineHeight:1.2,marginBottom:4}}>{getNombre(item)}</div>
-                        {getDesc(item) ? <div style={{fontSize:15,fontWeight:300,color:MUTED,lineHeight:1.6,letterSpacing:0.3}}>{getDesc(item)}</div> : null}
+                    <div key={idx} style={{padding:"16px 0",borderBottom:isLast?"none":`1px solid ${BORDER}`}}>
+                      <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+                        {item.imagen && (
+                          <img src={item.imagen} alt={getNombre(item)} width={56} height={56}
+                            style={{width:56,height:56,borderRadius:10,objectFit:"cover",flexShrink:0,border:`1px solid ${BORDER}`}}/>
+                        )}
+                        <div style={{flex:1,minWidth:0}}>
+                          {item.promo && <div style={{fontSize:8.5,fontWeight:500,letterSpacing:2,textTransform:"uppercase",color:SAND,border:`1px solid rgba(199,154,86,0.5)`,display:"inline-block",padding:"2px 7px",marginBottom:5}}>{t.oferta}</div>}
+                          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:23,fontWeight:item.promo?400:300,fontStyle:item.promo?"italic":"normal",color:NAVY,lineHeight:1.25,marginBottom:4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{getNombre(item)}</div>
+                          {getDesc(item) ? <div style={{fontSize:14,fontWeight:300,color:MUTED,lineHeight:1.5,letterSpacing:0.3}}>{getDesc(item)}</div> : null}
+                        </div>
                       </div>
-                      <div style={{flex:1,minWidth:20,borderBottom:`1px dotted rgba(0,0,0,0.15)`,marginBottom:6,alignSelf:"flex-end"}}/>
-                      <div style={{display:"flex",alignItems:"baseline",gap:12,flexShrink:0}}>
-                        <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:30,color:item.promo?SAND:TEAL2,whiteSpace:"nowrap",letterSpacing:0.5}}>{formatPeso(item.precio)}</div>
+                      <div style={{display:"flex",alignItems:"baseline",gap:10,marginTop:10,paddingLeft:item.imagen?66:0}}>
+                        <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:26,color:item.promo?SAND:TEAL2,whiteSpace:"nowrap",letterSpacing:0.5}}>{formatPeso(item.precio)}</div>
+                        <div style={{flex:1,minWidth:12,borderBottom:`1px dotted rgba(0,0,0,0.15)`,marginBottom:6}}/>
                         {item.disponible && (cant === 0 ? (
                           <button onClick={() => agregarItem(item)} style={{width:32,height:32,border:`1px solid ${TEAL}`,background:"transparent",color:TEAL,fontSize:19,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>+</button>
                         ) : (
