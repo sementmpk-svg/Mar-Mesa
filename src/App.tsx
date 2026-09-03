@@ -23,7 +23,6 @@ const CONFIG = {
   pagoMercadoPago: true,
   pagoTarjeta:     true,
   sheetsUrl:       "PEGAR_URL_DE_GOOGLE_APPS_SCRIPT_AQUI",
-  storageKey:      "marmesa_surveys_v1",
 };
 
 const NAVY   = "#1A1A1A";
@@ -68,15 +67,6 @@ interface CartItem {
   t?: Record<string, string[]>;
 }
 
-interface Survey {
-  estrellas: number;
-  idioma_util: string;
-  comodidad: string;
-  volveria: string;
-  comentario: string;
-  lang: string;
-  fecha: string;
-}
 
 interface MenuItem {
   categoria: string;
@@ -151,12 +141,6 @@ const SocialButton = ({ href, bg, children }: { href: string; bg: string; childr
 
 function formatPeso(n: number): string { return "$" + n.toLocaleString("es-AR"); }
 
-const STORAGE_KEY = CONFIG.storageKey;
-function loadSurveys(): Survey[] { try { const d = localStorage.getItem(STORAGE_KEY); return d ? JSON.parse(d) : []; } catch { return []; } }
-function saveSurvey(s: Survey): void {
-  try { const a = loadSurveys(); a.push(s); localStorage.setItem(STORAGE_KEY, JSON.stringify(a)); } catch {}
-  try { fetch(CONFIG.sheetsUrl, { method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(s) }); } catch {}
-}
 
 // ===================== TRADUCCIONES =====================
 const T: Record<Lang, Record<string, string>> = {
@@ -254,150 +238,7 @@ const ENC_T: Record<string, Record<string, string>> = {
 };
 function et(k: string, l: string): string { return ENC_T[k]?.[l] ?? ENC_T[k]?.es ?? ""; }
 
-function Encuesta({ lang, onSubmit, onSkip }: { lang: Lang; onSubmit: (s: Survey) => void; onSkip: () => void }) {
-  const [estrellas, setEstrellas] = useState(0);
-  const [hoverStar, setHoverStar] = useState(0);
-  const [idiomaUtil, setIdiomaUtil] = useState("");
-  const [comodidad, setComodidad] = useState("");
-  const [volveria, setVolveria] = useState("");
-  const [comentario, setComentario] = useState("");
-  const [enviado, setEnviado] = useState(false);
 
-  function handleSubmit() {
-    const s: Survey = { estrellas, idioma_util:idiomaUtil, comodidad, volveria, comentario, lang, fecha:new Date().toLocaleString("es-AR") };
-    saveSurvey(s); setEnviado(true); setTimeout(() => onSubmit(s), 1500);
-  }
-  const btnS = (active: boolean, col: string): CSSProperties => ({ flex:1, padding:"12px 6px", border:`1px solid ${active?col:BORDER}`, background:active?col:"transparent", color:active?WHITE:MUTED, fontSize:11, cursor:"pointer", fontFamily:"inherit", display:"flex", flexDirection:"column", alignItems:"center", gap:4, transition:"all 0.2s", borderRadius:4 });
-
-  if (enviado) return (
-    <div style={{textAlign:"center",padding:"60px 20px",background:CREAM,minHeight:"100vh",fontFamily:"'Jost',sans-serif"}}>
-      <style>{FONTS}</style>
-      <div style={{fontSize:48,marginBottom:12}}>🍽️</div>
-      <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontStyle:"italic",color:TEAL2}}>{et("gracias",lang)}</div>
-    </div>
-  );
-  return (
-    <div style={{background:CREAM,minHeight:"100vh",fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,paddingBottom:60}}>
-      <style>{FONTS}</style>
-      <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7}}/>
-      <div style={{background:WHITE,borderBottom:`1px solid ${BORDER}`,padding:"28px 24px 22px",textAlign:"center"}}>
-        <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:26,fontStyle:"italic",color:NAVY,marginBottom:4}}>{et("titulo",lang)}</div>
-        <div style={{fontSize:10,letterSpacing:3,color:MUTED,textTransform:"uppercase"}}>{et("sub",lang)}</div>
-      </div>
-      <div style={{padding:"24px 20px",display:"flex",flexDirection:"column",gap:14,maxWidth:480,margin:"0 auto"}}>
-        <div style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
-          <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>{et("q1",lang)}</div>
-          <div style={{display:"flex",justifyContent:"center"}}>
-            {[1,2,3,4,5].map(n => (
-              <button key={n} onClick={() => setEstrellas(n)} onMouseEnter={() => setHoverStar(n)} onMouseLeave={() => setHoverStar(0)}
-                style={{background:"none",border:"none",cursor:"pointer",fontSize:40,lineHeight:1,transition:"transform 0.15s",transform:(hoverStar||estrellas)>=n?"scale(1.2)":"scale(1)",filter:(hoverStar||estrellas)>=n?"none":"grayscale(1) opacity(0.25)",flex:1,padding:"6px 0",touchAction:"manipulation"}}>⭐</button>
-            ))}
-          </div>
-        </div>
-        {[
-          {label:et("q2",lang), state:idiomaUtil, set:setIdiomaUtil, opts:[{id:"si",l:"q2a"},{id:"mas_o_menos",l:"q2b"},{id:"no",l:"q2c"}], col:TEAL2},
-          {label:et("q3",lang), state:comodidad,  set:setComodidad,  opts:[{id:"muy_facil",l:"q3a"},{id:"normal",l:"q3b"},{id:"confuso",l:"q3c"}], col:"#27ae60"},
-          {label:et("q4",lang), state:volveria,   set:setVolveria,   opts:[{id:"si",l:"q4a"},{id:"papel",l:"q4b"},{id:"igual",l:"q4c"}], col:NAVY},
-        ].map((q, qi) => (
-          <div key={qi} style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
-            <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>{q.label}</div>
-            <div style={{display:"flex",gap:8}}>
-              {q.opts.map(op => (
-                <button key={op.id} onClick={() => q.set(op.id)} style={btnS(q.state===op.id, q.col)}>
-                  <span style={{fontSize:18}}>{et(op.l,lang).split(" ")[0]}</span>
-                  <span style={{fontSize:10}}>{et(op.l,lang).split(" ").slice(1).join(" ")}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-        <div style={{background:WHITE,padding:"20px",border:`1px solid ${BORDER}`}}>
-          <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:10}}>{et("q5",lang)}</div>
-          <textarea value={comentario} onChange={e => setComentario(e.target.value)} placeholder="..." rows={3}
-            style={{width:"100%",padding:"12px",background:CREAM,border:`1px solid ${BORDER}`,color:NAVY,fontSize:13,fontFamily:"inherit",resize:"none",outline:"none",boxSizing:"border-box"}}/>
-        </div>
-        <button onClick={handleSubmit} disabled={estrellas===0}
-          style={{width:"100%",padding:"15px",background:estrellas>0?TEAL2:"#ccc",color:WHITE,border:"none",fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:estrellas>0?"pointer":"not-allowed",fontFamily:"inherit"}}>
-          {et("enviar",lang)}
-        </button>
-        <button onClick={onSkip}
-          style={{width:"100%",padding:"12px",background:"transparent",color:MUTED,border:`1px solid ${BORDER}`,fontSize:10,letterSpacing:2,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>
-          {et("saltar",lang)}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AdminPanel({ onClose }: { onClose: () => void }) {
-  const surveys = loadSurveys();
-  const total = surveys.length;
-  const avg = total > 0 ? (surveys.reduce((s,x) => s+x.estrellas, 0)/total).toFixed(1) : "—";
-  const stars = [1,2,3,4,5].map(n => ({ n, count:surveys.filter(s => s.estrellas===n).length }));
-  const langs = (["es","en","pt","it","fr","ru"] as Lang[]).map(l => ({ l, count:surveys.filter(s => s.lang===l).length, flag:T[l].flag }));
-  const comments = surveys.filter(s => s.comentario?.trim().length > 0);
-  return (
-    <div style={{minHeight:"100vh",background:CREAM,fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,paddingBottom:40}}>
-      <style>{FONTS}</style>
-      <div style={{height:4,background:`linear-gradient(to right,${TEAL},${TEAL2},${TEAL})`,opacity:0.7}}/>
-      <div style={{background:WHITE,borderBottom:`1px solid ${BORDER}`,padding:"20px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div>
-          <div style={{fontSize:9,letterSpacing:4,color:MUTED,textTransform:"uppercase",marginBottom:4}}>Panel privado</div>
-          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:NAVY}}>📋 Resultados</div>
-        </div>
-        <button onClick={onClose} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"7px 16px",cursor:"pointer",fontFamily:"inherit",fontSize:10,letterSpacing:2}}>✕ CERRAR</button>
-      </div>
-      <div style={{padding:"20px",display:"flex",flexDirection:"column",gap:12,maxWidth:480,margin:"0 auto"}}>
-        {total === 0 ? (
-          <div style={{textAlign:"center",padding:"60px 20px",color:MUTED}}>
-            <div style={{fontSize:40}}>📭</div>
-            <div style={{marginTop:12,fontFamily:"'Cormorant Garamond',serif",fontSize:20,fontStyle:"italic"}}>Sin respuestas aún</div>
-          </div>
-        ) : (
-          <>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-              <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>{total}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Respuestas</div></div>
-              <div style={{background:WHITE,padding:"16px",textAlign:"center",border:`1px solid ${BORDER}`}}><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:40,color:TEAL2}}>⭐{avg}</div><div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginTop:4}}>Promedio</div></div>
-            </div>
-            <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-              <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Distribución de estrellas</div>
-              {[...stars].reverse().map(({n,count}) => (
-                <div key={n} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                  <span style={{fontSize:11,color:MUTED,minWidth:20}}>{n}★</span>
-                  <div style={{flex:1,height:6,background:CREAM,overflow:"hidden"}}><div style={{height:"100%",width:total>0?`${(count/total)*100}%`:"0%",background:n>=4?SAND:TEAL,transition:"width 0.5s"}}/></div>
-                  <span style={{fontSize:11,color:NAVY,minWidth:20,textAlign:"right"}}>{count}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-              <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Idiomas</div>
-              <div style={{display:"flex",gap:14,justifyContent:"center"}}>
-                {langs.filter(l => l.count > 0).map(l => (
-                  <div key={l.l} style={{textAlign:"center"}}><div style={{fontSize:24}}>{l.flag}</div><div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:TEAL2}}>{l.count}</div></div>
-                ))}
-              </div>
-            </div>
-            {comments.length > 0 && (
-              <div style={{background:WHITE,padding:"16px",border:`1px solid ${BORDER}`}}>
-                <div style={{fontSize:9,letterSpacing:3,color:MUTED,textTransform:"uppercase",marginBottom:14}}>Comentarios recientes</div>
-                {comments.slice(-5).reverse().map((s,i) => (
-                  <div key={i} style={{borderBottom:`1px solid ${BORDER}`,padding:"10px 0"}}>
-                    <div style={{fontSize:10,color:MUTED,marginBottom:4}}>{s.fecha} · {T[s.lang as Lang]?.flag} · {"⭐".repeat(s.estrellas)}</div>
-                    <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,fontStyle:"italic",color:NAVY}}>{s.comentario}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button onClick={() => { if (confirm("¿Borrar todos los datos?")) { localStorage.removeItem(STORAGE_KEY); onClose(); } }}
-              style={{width:"100%",padding:"12px",background:"transparent",color:"#c0392b",border:"1px solid rgba(192,57,43,0.3)",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>
-              🗑️ Borrar todos los datos
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ===================== APP =====================
 export default function App() {
@@ -409,7 +250,6 @@ export default function App() {
   const [showCarrito, setShowCarrito] = useState(false);
   const [pedidoEnviado, setPedidoEnviado] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
-  const [showEncuesta, setShowEncuesta] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminTaps, setAdminTaps] = useState(0);
   const [loaded, setLoaded] = useState(false);
@@ -444,7 +284,7 @@ export default function App() {
     });
   }
   function cantidadEnCarrito(nombre: string): number { return carrito.find(c => c.nombre===nombre)?.cantidad || 0; }
-  function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); setShowEncuesta(false); }
+  function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); }
 
   const categories = ["all", ...Array.from(new Set(MENU.map(i => i.categoria)))];
   const filtered = activeCategory==="all" ? MENU : MENU.filter(i => i.categoria===activeCategory);
@@ -488,15 +328,9 @@ export default function App() {
     );
   }
 
-  if (showAdmin) return <AdminPanel onClose={() => setShowAdmin(false)}/>;
 
   // ── CARRITO ──
   if (showCarrito) {
-    if (showEncuesta) return (
-      <div style={{background:CREAM,minHeight:"100vh",width:"100%"}}>
-        <Encuesta lang={lang} onSubmit={() => { setShowEncuesta(false); nuevosPedido(); }} onSkip={() => { setShowEncuesta(false); nuevosPedido(); }}/>
-      </div>
-    );
     return (
       <div style={{background:CREAM,minHeight:"100vh",width:"100%",fontFamily:"'Jost',sans-serif",fontWeight:300,color:NAVY,display:"flex",flexDirection:"column"}}>
         <style>{FONTS}</style>
@@ -528,7 +362,6 @@ export default function App() {
                 <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:26,letterSpacing:0.5,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
               </div>
             </div>
-            <button onClick={() => setShowEncuesta(true)} style={{width:"100%",padding:"14px",background:TEAL2,color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>💬 {t.encuesta}</button>
             <button onClick={nuevosPedido} style={{width:"100%",padding:"12px",background:"transparent",color:MUTED,border:`1px solid ${BORDER}`,fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.nuevoPedido}</button>
           </div>
         ) : (
