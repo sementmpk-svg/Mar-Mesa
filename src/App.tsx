@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 const CONFIG = {
   nombre:          "Desnivel",
@@ -215,28 +215,6 @@ function OrderCheck() {
   );
 }
 
-const ENC_T: Record<string, Record<string, string>> = {
-  titulo:{es:"¿Cómo fue tu experiencia?",en:"How was your experience?",pt:"Como foi sua experiência?",it:"Com'è stata la tua esperienza?",fr:"Comment était votre expérience ?",ru:"Как вам наше меню?"},
-  sub:{es:"Tu opinión nos ayuda a mejorar",en:"Your feedback helps us improve",pt:"Sua opinião nos ajuda a melhorar",it:"La tua opinione ci aiuta a migliorare",fr:"Votre avis nous aide à améliorer",ru:"Ваше мнение помогает нам стать лучше"},
-  q1:{es:"¿Cómo calificás el menú?",en:"How do you rate the menu?",pt:"Como você avalia o cardápio?",it:"Come valuti il menù?",fr:"Comment évaluez-vous le menu ?",ru:"Как вы оцениваете меню?"},
-  q2:{es:"¿El menú en tu idioma fue útil?",en:"Was the menu in your language helpful?",pt:"O cardápio no seu idioma foi útil?",it:"Il menù nella tua lingua è stato utile?",fr:"Le menu dans votre langue était-il utile ?",ru:"Меню на вашем языке было полезным?"},
-  q2a:{es:"🌍 Sí, mucho",en:"🌍 Yes, very much",pt:"🌍 Sim, muito",it:"🌍 Sì, molto",fr:"🌍 Oui, beaucoup",ru:"🌍 Да, очень"},
-  q2b:{es:"🤔 Más o menos",en:"🤔 Somewhat",pt:"🤔 Mais ou menos",it:"🤔 Abbastanza",fr:"🤔 Un peu",ru:"🤔 Частично"},
-  q2c:{es:"❌ No tanto",en:"❌ Not really",pt:"❌ Não muito",it:"❌ Non molto",fr:"❌ Pas vraiment",ru:"❌ Не очень"},
-  q3:{es:"¿Qué tan fácil fue navegar?",en:"How easy was it to navigate?",pt:"Foi fácil navegar?",it:"È stato facile navigare?",fr:"Était-il facile de naviguer ?",ru:"Удобно ли было пользоваться?"},
-  q3a:{es:"😊 Muy fácil",en:"😊 Very easy",pt:"😊 Muito fácil",it:"😊 Molto facile",fr:"😊 Très facile",ru:"😊 Очень удобно"},
-  q3b:{es:"🙂 Normal",en:"🙂 Normal",pt:"🙂 Normal",it:"🙂 Normale",fr:"🙂 Normal",ru:"🙂 Нормально"},
-  q3c:{es:"😕 Me confundí",en:"😕 Got confused",pt:"😕 Me confundi",it:"😕 Mi sono confuso",fr:"😕 Je me suis perdu",ru:"😕 Запутался"},
-  q4:{es:"¿Usarías este menú de nuevo?",en:"Would you use this menu again?",pt:"Usaria este cardápio de novo?",it:"Useresti di nuovo questo menù?",fr:"Utiliseriez-vous ce menu à nouveau ?",ru:"Воспользовались бы снова?"},
-  q4a:{es:"👍 Sí, claro",en:"👍 Yes, definitely",pt:"👍 Sim, claro",it:"👍 Sì, certo",fr:"👍 Oui, bien sûr",ru:"👍 Да, конечно"},
-  q4b:{es:"📄 Prefiero papel",en:"📄 Prefer paper",pt:"📄 Prefiro papel",it:"📄 Preferisco carta",fr:"📄 Je préfère papier",ru:"📄 Предпочитаю бумажное"},
-  q4c:{es:"🤷 Me da igual",en:"🤷 Doesn't matter",pt:"🤷 Tanto faz",it:"🤷 Non importa",fr:"🤷 Peu importe",ru:"🤷 Всё равно"},
-  q5:{es:"Comentario (opcional)",en:"Comment (optional)",pt:"Comentário (opcional)",it:"Commento (opzionale)",fr:"Commentaire (optionnel)",ru:"Комментарий (необязательно)"},
-  enviar:{es:"Enviar opinión",en:"Send feedback",pt:"Enviar opinião",it:"Invia opinione",fr:"Envoyer l'avis",ru:"Отправить отзыв"},
-  saltar:{es:"Saltar",en:"Skip",pt:"Pular",it:"Salta",fr:"Passer",ru:"Пропустить"},
-  gracias:{es:"¡Gracias! 🙏",en:"Thanks! 🙏",pt:"Obrigado! 🙏",it:"Grazie! 🙏",fr:"Merci ! 🙏",ru:"Спасибо! 🙏"},
-};
-function et(k: string, l: string): string { return ENC_T[k]?.[l] ?? ENC_T[k]?.es ?? ""; }
 
 
 
@@ -250,15 +228,12 @@ export default function App() {
   const [showCarrito, setShowCarrito] = useState(false);
   const [pedidoEnviado, setPedidoEnviado] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [adminTaps, setAdminTaps] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => { setTimeout(() => setLoaded(true), 150); }, []);
   useEffect(() => { if (pedidoEnviado) setTimeout(() => setShowCheck(true), 100); else setShowCheck(false); }, [pedidoEnviado]);
 
   function chooseLang(l: Lang) { setLang(l); setLangAnim(true); setTimeout(() => { setLangSelected(true); window.scrollTo(0,0); }, 500); }
-  function handleFooterTap() { const n = adminTaps+1; setAdminTaps(n); if (n >= 5) { setShowAdmin(true); setAdminTaps(0); } }
 
   const t = T[lang];
   const totalItems = carrito.reduce((s,i) => s+i.cantidad, 0);
@@ -550,7 +525,7 @@ export default function App() {
           </div>
         </div>
 
-        <footer onClick={handleFooterTap} style={{margin:"28px 20px 0",paddingTop:24,borderTop:`1px solid ${BORDER}`,textAlign:"center",cursor:"default"}}>
+        <footer style={{margin:"28px 20px 0",paddingTop:24,borderTop:`1px solid ${BORDER}`,textAlign:"center",cursor:"default"}}>
           <div style={{display:"flex",justifyContent:"center",marginBottom:14,opacity:0.75}}><BrushEmblem size={64} color={MUTED as string}/></div>
           <div style={{display:"flex",justifyContent:"center",gap:20,marginBottom:12}}>
             {CONFIG.pagoEfectivo && <span style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:MUTED}}>💵 {t.efectivo}</span>}
