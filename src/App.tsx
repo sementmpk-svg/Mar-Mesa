@@ -144,12 +144,12 @@ function formatPeso(n: number): string { return "$" + n.toLocaleString("es-AR");
 
 // ===================== TRADUCCIONES =====================
 const T: Record<Lang, Record<string, string>> = {
-  es: { flag:"🇪🇸", langName:"Español",   todo:"Todo", oferta:"Chef recomienda", efectivo:"Efectivo", tarjeta:"Tarjeta", precios:"Precios en pesos argentinos · IVA incluido", verPedido:"🛒 Carrito", tuPedido:"Tu pedido", revisaPedido:"Revisá tu pedido", mostrarMozo:"¡Listo! Mostrá esta pantalla al mozo", instruccion:"El mozo tomará nota de tu pedido", carritoVacio:"Tu carrito está vacío", verMenu:"Ver menú", confirmar:"Confirmar y llamar al mozo", volver:"← Volver", cu:"c/u", item:"item", items:"items", nuevoPedido:"Nuevo pedido", encuesta:"¿Cómo fue tu experiencia?", enviarEncuesta:"Enviar opinión", saltarEncuesta:"Saltar", graciasEncuesta:"¡Gracias! 🙏" },
-  en: { flag:"🇬🇧", langName:"English",   todo:"All",  oferta:"Chef recommends", efectivo:"Cash", tarjeta:"Card", precios:"Prices in Argentine pesos · VAT included", verPedido:"🛒 Cart", tuPedido:"Your order", revisaPedido:"Review your order", mostrarMozo:"Done! Show this screen to the waiter", instruccion:"The waiter will take note of your order", carritoVacio:"Your cart is empty", verMenu:"See menu", confirmar:"Confirm & call waiter", volver:"← Back", cu:"each", item:"item", items:"items", nuevoPedido:"New order", encuesta:"How was your experience?", enviarEncuesta:"Send feedback", saltarEncuesta:"Skip", graciasEncuesta:"Thanks! 🙏" },
-  pt: { flag:"🇧🇷", langName:"Português", todo:"Tudo", oferta:"Chef recomenda", efectivo:"Dinheiro", tarjeta:"Cartão", precios:"Preços em pesos argentinos · IVA incluído", verPedido:"🛒 Carrinho", tuPedido:"Seu pedido", revisaPedido:"Revise seu pedido", mostrarMozo:"Pronto! Mostre esta tela ao garçom", instruccion:"O garçom anotará seu pedido", carritoVacio:"Seu carrinho está vazio", verMenu:"Ver cardápio", confirmar:"Confirmar e chamar o garçom", volver:"← Voltar", cu:"un.", item:"item", items:"itens", nuevoPedido:"Novo pedido", encuesta:"Como foi sua experiência?", enviarEncuesta:"Enviar opinião", saltarEncuesta:"Pular", graciasEncuesta:"Obrigado! 🙏" },
-  it: { flag:"🇮🇹", langName:"Italiano",  todo:"Tutto", oferta:"Lo chef consiglia", efectivo:"Contanti", tarjeta:"Carta", precios:"Prezzi in pesos argentini · IVA inclusa", verPedido:"🛒 Carrello", tuPedido:"Il tuo ordine", revisaPedido:"Rivedi il tuo ordine", mostrarMozo:"Fatto! Mostra questo schermo al cameriere", instruccion:"Il cameriere prenderà nota del tuo ordine", carritoVacio:"Il carrello è vuoto", verMenu:"Vedi menù", confirmar:"Conferma e chiama il cameriere", volver:"← Torna", cu:"cad.", item:"articolo", items:"articoli", nuevoPedido:"Nuovo ordine", encuesta:"Com'è stata la tua esperienza?", enviarEncuesta:"Invia opinione", saltarEncuesta:"Salta", graciasEncuesta:"Grazie! 🙏" },
-  fr: { flag:"🇫🇷", langName:"Français",  todo:"Tout", oferta:"Le chef recommande", efectivo:"Espèces", tarjeta:"Carte", precios:"Prix en pesos argentins · TVA incluse", verPedido:"🛒 Panier", tuPedido:"Votre commande", revisaPedido:"Vérifiez votre commande", mostrarMozo:"Prêt ! Montrez cet écran au serveur", instruccion:"Le serveur notera votre commande", carritoVacio:"Votre panier est vide", verMenu:"Voir le menu", confirmar:"Confirmer et appeler le serveur", volver:"← Retour", cu:"p/u", item:"article", items:"articles", nuevoPedido:"Nouvelle commande", encuesta:"Comment était votre expérience ?", enviarEncuesta:"Envoyer l'avis", saltarEncuesta:"Passer", graciasEncuesta:"Merci ! 🙏" },
-  ru: { flag:"🇷🇺", langName:"Русский",   todo:"Всё",  oferta:"Рекомендует шеф", efectivo:"Наличные", tarjeta:"Карта", precios:"Цены в аргентинских песо · НДС включён", verPedido:"🛒 Корзина", tuPedido:"Ваш заказ", revisaPedido:"Проверьте ваш заказ", mostrarMozo:"Готово! Покажите экран официанту", instruccion:"Официант запишет ваш заказ", carritoVacio:"Корзина пуста", verMenu:"Смотреть меню", confirmar:"Подтвердить и позвать официанта", volver:"← Назад", cu:"шт.", item:"позиция", items:"позиции", nuevoPedido:"Новый заказ", encuesta:"Как вам наше меню?", enviarEncuesta:"Отправить отзыв", saltarEncuesta:"Пропустить", graciasEncuesta:"Спасибо! 🙏" },
+  es: { flag:"🇪🇸", langName:"Español",   todo:"Todo", oferta:"Chef recomienda", efectivo:"Efectivo", tarjeta:"Tarjeta", precios:"Precios en pesos argentinos · IVA incluido", verPedido:"🛒 Carrito", tuPedido:"Tu pedido", revisaPedido:"Revisá tu pedido", mostrarMozo:"¡Listo! Mostrá esta pantalla al mozo", instruccion:"El mozo tomará nota de tu pedido", carritoVacio:"Tu carrito está vacío", verMenu:"Ver menú", confirmar:"Confirmar y llamar al mozo", volver:"← Volver", cu:"c/u", item:"item", items:"items", nuevoPedido:"Nuevo pedido", encuesta:"¿Cómo fue tu experiencia?", enviarEncuesta:"Enviar opinión", saltarEncuesta:"Saltar", graciasEncuesta:"¡Gracias! 🙏", comoLlegar:"Cómo llegar", abrirMaps:"Abrir en Maps →" },
+  en: { flag:"🇬🇧", langName:"English",   todo:"All",  oferta:"Chef recommends", efectivo:"Cash", tarjeta:"Card", precios:"Prices in Argentine pesos · VAT included", verPedido:"🛒 Cart", tuPedido:"Your order", revisaPedido:"Review your order", mostrarMozo:"Done! Show this screen to the waiter", instruccion:"The waiter will take note of your order", carritoVacio:"Your cart is empty", verMenu:"See menu", confirmar:"Confirm & call waiter", volver:"← Back", cu:"each", item:"item", items:"items", nuevoPedido:"New order", encuesta:"How was your experience?", enviarEncuesta:"Send feedback", saltarEncuesta:"Skip", graciasEncuesta:"Thanks! 🙏", comoLlegar:"How to get here", abrirMaps:"Open in Maps →" },
+  pt: { flag:"🇧🇷", langName:"Português", todo:"Tudo", oferta:"Chef recomenda", efectivo:"Dinheiro", tarjeta:"Cartão", precios:"Preços em pesos argentinos · IVA incluído", verPedido:"🛒 Carrinho", tuPedido:"Seu pedido", revisaPedido:"Revise seu pedido", mostrarMozo:"Pronto! Mostre esta tela ao garçom", instruccion:"O garçom anotará seu pedido", carritoVacio:"Seu carrinho está vazio", verMenu:"Ver cardápio", confirmar:"Confirmar e chamar o garçom", volver:"← Voltar", cu:"un.", item:"item", items:"itens", nuevoPedido:"Novo pedido", encuesta:"Como foi sua experiência?", enviarEncuesta:"Enviar opinião", saltarEncuesta:"Pular", graciasEncuesta:"Obrigado! 🙏", comoLlegar:"Como chegar", abrirMaps:"Abrir no Maps →" },
+  it: { flag:"🇮🇹", langName:"Italiano",  todo:"Tutto", oferta:"Lo chef consiglia", efectivo:"Contanti", tarjeta:"Carta", precios:"Prezzi in pesos argentini · IVA inclusa", verPedido:"🛒 Carrello", tuPedido:"Il tuo ordine", revisaPedido:"Rivedi il tuo ordine", mostrarMozo:"Fatto! Mostra questo schermo al cameriere", instruccion:"Il cameriere prenderà nota del tuo ordine", carritoVacio:"Il carrello è vuoto", verMenu:"Vedi menù", confirmar:"Conferma e chiama il cameriere", volver:"← Torna", cu:"cad.", item:"articolo", items:"articoli", nuevoPedido:"Nuovo ordine", encuesta:"Com'è stata la tua esperienza?", enviarEncuesta:"Invia opinione", saltarEncuesta:"Salta", graciasEncuesta:"Grazie! 🙏", comoLlegar:"Come arrivare", abrirMaps:"Apri in Maps →" },
+  fr: { flag:"🇫🇷", langName:"Français",  todo:"Tout", oferta:"Le chef recommande", efectivo:"Espèces", tarjeta:"Carte", precios:"Prix en pesos argentins · TVA incluse", verPedido:"🛒 Panier", tuPedido:"Votre commande", revisaPedido:"Vérifiez votre commande", mostrarMozo:"Prêt ! Montrez cet écran au serveur", instruccion:"Le serveur notera votre commande", carritoVacio:"Votre panier est vide", verMenu:"Voir le menu", confirmar:"Confirmer et appeler le serveur", volver:"← Retour", cu:"p/u", item:"article", items:"articles", nuevoPedido:"Nouvelle commande", encuesta:"Comment était votre expérience ?", enviarEncuesta:"Envoyer l'avis", saltarEncuesta:"Passer", graciasEncuesta:"Merci ! 🙏", comoLlegar:"Comment y aller", abrirMaps:"Ouvrir dans Maps →" },
+  ru: { flag:"🇷🇺", langName:"Русский",   todo:"Всё",  oferta:"Рекомендует шеф", efectivo:"Наличные", tarjeta:"Карта", precios:"Цены в аргентинских песо · НДС включён", verPedido:"🛒 Корзина", tuPedido:"Ваш заказ", revisaPedido:"Проверьте ваш заказ", mostrarMozo:"Готово! Покажите экран официанту", instruccion:"Официант запишет ваш заказ", carritoVacio:"Корзина пуста", verMenu:"Смотреть меню", confirmar:"Подтвердить и позвать официанта", volver:"← Назад", cu:"шт.", item:"позиция", items:"позиции", nuevoPedido:"Новый заказ", encuesta:"Как вам наше меню?", enviarEncuesta:"Отправить отзыв", saltarEncuesta:"Пропустить", graciasEncuesta:"Спасибо! 🙏", comoLlegar:"Как добраться", abrirMaps:"Открыть в Maps →" },
 };
 
 const MENU: MenuItem[] = [
@@ -497,32 +497,15 @@ export default function App() {
           );
         })}
 
-        <div style={{margin:"8px 20px 0",paddingTop:24,borderTop:`1px solid ${BORDER}`}}>
-          <div style={{display:"flex",alignItems:"baseline",gap:12,marginBottom:14}}>
-            <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:13,fontStyle:"italic",color:SAND,letterSpacing:1}}>📍</div>
-            <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:24,fontWeight:300,fontStyle:"italic",color:NAVY}}>Cómo llegar</div>
+        <div style={{margin:"8px 20px 0",paddingTop:20,borderTop:`1px solid ${BORDER}`}}>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontWeight:300,fontStyle:"italic",color:NAVY,marginBottom:8}}>
+            📍 {t.comoLlegar}
           </div>
-          {/*
-            Mapa interactivo real de Google Maps.
-            Este iframe funciona perfectamente en un sitio web real (WordPress, hosting propio, etc).
-            En la vista previa de artefactos de Claude puede verse en blanco: el sandbox de Claude
-            bloquea iframes externos por seguridad, pero el código es válido y funcional al publicarlo.
-          */}
-          <div style={{border:`1px solid ${BORDER}`,overflow:"hidden",boxShadow:`0 2px 12px ${BORDER}`,background:CREAM}}>
-            <iframe
-              title="Ubicación de Desnivel en Google Maps"
-              src={`https://www.google.com/maps?q=${CONFIG.mapLat},${CONFIG.mapLng}&z=17&output=embed`}
-              width="100%" height="260" style={{border:0,display:"block"}}
-              loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen/>
-          </div>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10}}>
-            <div style={{fontSize:11,color:MUTED,letterSpacing:0.3}}>{CONFIG.direccion}</div>
-            <a href={CONFIG.mapUrl}
-              target="_blank" rel="noopener noreferrer"
-              style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:TEAL2,textDecoration:"none",whiteSpace:"nowrap"}}>
-              Abrir en Maps →
-            </a>
-          </div>
+          <div style={{fontSize:12,color:MUTED,letterSpacing:0.3,marginBottom:6}}>{CONFIG.direccion}</div>
+          <a href={CONFIG.mapUrl} target="_blank" rel="noopener noreferrer"
+            style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:TEAL2,textDecoration:"none"}}>
+            {t.abrirMaps}
+          </a>
         </div>
 
         <footer style={{margin:"28px 20px 0",paddingTop:24,borderTop:`1px solid ${BORDER}`,textAlign:"center",cursor:"default"}}>
