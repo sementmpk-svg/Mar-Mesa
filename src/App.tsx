@@ -404,7 +404,14 @@ export default function App() {
             <div style={{fontSize:8,letterSpacing:2.5,textTransform:"uppercase",color:MUTED,marginTop:1}}>{CONFIG.subtitulo}</div>
           </div>
         </div>
-        <button onClick={() => setLangSelected(false)} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:10,display:"flex",alignItems:"center",gap:5,letterSpacing:0.5,flexShrink:0}}>
+        <button onClick={() => {
+            setLangSelected(false);
+            setLangAnim(false);
+            setCarrito([]);
+            setPedidoEnviado(false);
+            setShowCarrito(false);
+            window.scrollTo(0, 0);
+          }} style={{background:"transparent",border:`1px solid ${BORDER}`,color:MUTED,padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:10,display:"flex",alignItems:"center",gap:5,letterSpacing:0.5,flexShrink:0}}>
           <span>{T[lang].flag}</span><span>{T[lang].langName}</span>
         </button>
       </div>
