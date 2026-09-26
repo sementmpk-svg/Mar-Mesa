@@ -352,37 +352,44 @@ export default function App() {
             <button onClick={nuevosPedido} style={{width:"100%",padding:"12px",background:"transparent",color:"#333",border:"1.5px solid #4A4A4A",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",fontWeight:500}}>{t.nuevoPedido}</button>
           </div>
         ) : (
-          <div style={{padding:"20px",flex:1}}>
-            <div style={{fontSize:9,letterSpacing:2,color:MUTED,textTransform:"uppercase",marginBottom:20}}>{t.revisaPedido}</div>
+          <div style={{padding:"20px",flex:1,display:"flex",flexDirection:"column"}}>
+            <div style={{fontSize:9,letterSpacing:2,color:MUTED,textTransform:"uppercase",marginBottom:16}}>{t.revisaPedido}</div>
             {carrito.length === 0 ? (
-              <div style={{textAlign:"center",padding:"60px 20px",color:MUTED}}>
-                <div style={{fontSize:40}}>🍽️</div>
-                <div style={{marginTop:12,fontFamily:"'Cormorant Garamond',serif",fontSize:22,fontStyle:"italic",color:NAVY}}>{t.carritoVacio}</div>
-                <button onClick={() => setShowCarrito(false)} style={{marginTop:20,padding:"10px 28px",background:TEAL2,color:WHITE,border:"none",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.verMenu}</button>
+              <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:"0 20px"}}>
+                <div style={{fontSize:52}}>🍽️</div>
+                <div style={{marginTop:16,fontFamily:"'Cormorant Garamond',serif",fontSize:24,fontStyle:"italic",color:NAVY}}>{t.carritoVacio}</div>
+                <button onClick={() => setShowCarrito(false)} style={{marginTop:24,padding:"12px 32px",background:TEAL2,color:WHITE,border:"none",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>{t.verMenu}</button>
               </div>
             ) : (
               <>
-                {carrito.map((item,idx) => (
-                  <div key={idx} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:`1px solid ${BORDER}`}}>
-                    <span style={{fontSize:20}}>{item.emoji}</span>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:NAVY}}>{getCartNombre(item)}</div>
-                      <div style={{fontSize:11,color:MUTED,marginTop:1}}>{formatPeso(item.precio)} {t.cu}</div>
+                {/* Список блюд растягивается на всё свободное место */}
+                <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"space-evenly"}}>
+                  {carrito.map((item,idx) => (
+                    <div key={idx} style={{display:"flex",alignItems:"center",gap:12,padding:"18px 0",borderBottom:`1px solid ${BORDER}`}}>
+                      <span style={{fontSize:24,flexShrink:0}}>{item.emoji}</span>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:18,color:NAVY,lineHeight:1.2}}>{getCartNombre(item)}</div>
+                        <div style={{fontSize:12,color:MUTED,marginTop:3}}>{formatPeso(item.precio)} {t.cu}</div>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <button onClick={() => quitarItem(item.nombre)} style={{width:30,height:30,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                        <span style={{fontSize:16,color:NAVY,minWidth:18,textAlign:"center",fontWeight:500}}>{item.cantidad}</span>
+                        <button onClick={() => agregarItem(item as unknown as MenuItem)} style={{width:30,height:30,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                      </div>
+                      <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:24,letterSpacing:0.5,color:TEAL2,minWidth:74,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
                     </div>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <button onClick={() => quitarItem(item.nombre)} style={{width:26,height:26,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                      <span style={{fontSize:13,color:NAVY,minWidth:16,textAlign:"center"}}>{item.cantidad}</span>
-                      <button onClick={() => agregarItem(item as unknown as MenuItem)} style={{width:26,height:26,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-                    </div>
-                    <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
-                  </div>
-                ))}
-                <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"16px 0",borderTop:`1px solid ${TEAL}30`,marginTop:8}}>
-                  <span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1}}>TOTAL</span>
-                  <div style={{flex:2,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
-                  <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:30,letterSpacing:0.5,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
+                  ))}
                 </div>
-                <button onClick={() => setPedidoEnviado(true)} style={{width:"100%",padding:"15px",background:"#1a1a1a",color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginTop:8}}>📋 {t.confirmar}</button>
+
+                {/* Итог и кнопка всегда внизу */}
+                <div style={{paddingTop:20,marginTop:8}}>
+                  <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"16px 0",borderTop:`2px solid ${TEAL}20`}}>
+                    <span style={{fontSize:10,fontWeight:500,letterSpacing:3,textTransform:"uppercase",flex:1,color:MUTED}}>TOTAL</span>
+                    <div style={{flex:2,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
+                    <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:34,letterSpacing:0.5,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
+                  </div>
+                  <button onClick={() => setPedidoEnviado(true)} style={{width:"100%",padding:"16px",background:"#1a1a1a",color:WHITE,border:"none",fontSize:9,fontWeight:500,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit"}}>📋 {t.confirmar}</button>
+                </div>
               </>
             )}
           </div>
