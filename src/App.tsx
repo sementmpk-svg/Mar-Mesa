@@ -65,6 +65,7 @@ interface CartItem {
   precio: number;
   cantidad: number;
   imagen?: string;
+  nota?: string;
   t?: Record<string, string[]>;
 }
 
@@ -145,12 +146,12 @@ function formatPeso(n: number): string { return "$" + n.toLocaleString("es-AR");
 
 // ===================== TRADUCCIONES =====================
 const T: Record<Lang, Record<string, string>> = {
-  es: { flag:"🇪🇸", langName:"Español",   todo:"Todo", oferta:"Chef recomienda", efectivo:"Efectivo", tarjeta:"Tarjeta", precios:"Precios en pesos argentinos · IVA incluido", verPedido:"🛒 Carrito", tuPedido:"Tu pedido", revisaPedido:"Revisá tu pedido", mostrarMozo:"¡Listo! Mostrá esta pantalla al mozo", instruccion:"El mozo tomará nota de tu pedido", carritoVacio:"Tu carrito está vacío", verMenu:"Ver menú", confirmar:"Confirmar y llamar al mozo", volver:"← Volver", cu:"c/u", item:"item", items:"items", nuevoPedido:"Nuevo pedido", encuesta:"¿Cómo fue tu experiencia?", enviarEncuesta:"Enviar opinión", saltarEncuesta:"Saltar", graciasEncuesta:"¡Gracias! 🙏", comoLlegar:"Cómo llegar", abrirMaps:"Abrir en Maps →" },
-  en: { flag:"🇬🇧", langName:"English",   todo:"All",  oferta:"Chef recommends", efectivo:"Cash", tarjeta:"Card", precios:"Prices in Argentine pesos · VAT included", verPedido:"🛒 Cart", tuPedido:"Your order", revisaPedido:"Review your order", mostrarMozo:"Done! Show this screen to the waiter", instruccion:"The waiter will take note of your order", carritoVacio:"Your cart is empty", verMenu:"See menu", confirmar:"Confirm & call waiter", volver:"← Back", cu:"each", item:"item", items:"items", nuevoPedido:"New order", encuesta:"How was your experience?", enviarEncuesta:"Send feedback", saltarEncuesta:"Skip", graciasEncuesta:"Thanks! 🙏", comoLlegar:"How to get here", abrirMaps:"Open in Maps →" },
-  pt: { flag:"🇧🇷", langName:"Português", todo:"Tudo", oferta:"Chef recomenda", efectivo:"Dinheiro", tarjeta:"Cartão", precios:"Preços em pesos argentinos · IVA incluído", verPedido:"🛒 Carrinho", tuPedido:"Seu pedido", revisaPedido:"Revise seu pedido", mostrarMozo:"Pronto! Mostre esta tela ao garçom", instruccion:"O garçom anotará seu pedido", carritoVacio:"Seu carrinho está vazio", verMenu:"Ver cardápio", confirmar:"Confirmar e chamar o garçom", volver:"← Voltar", cu:"un.", item:"item", items:"itens", nuevoPedido:"Novo pedido", encuesta:"Como foi sua experiência?", enviarEncuesta:"Enviar opinião", saltarEncuesta:"Pular", graciasEncuesta:"Obrigado! 🙏", comoLlegar:"Como chegar", abrirMaps:"Abrir no Maps →" },
-  it: { flag:"🇮🇹", langName:"Italiano",  todo:"Tutto", oferta:"Lo chef consiglia", efectivo:"Contanti", tarjeta:"Carta", precios:"Prezzi in pesos argentini · IVA inclusa", verPedido:"🛒 Carrello", tuPedido:"Il tuo ordine", revisaPedido:"Rivedi il tuo ordine", mostrarMozo:"Fatto! Mostra questo schermo al cameriere", instruccion:"Il cameriere prenderà nota del tuo ordine", carritoVacio:"Il carrello è vuoto", verMenu:"Vedi menù", confirmar:"Conferma e chiama il cameriere", volver:"← Torna", cu:"cad.", item:"articolo", items:"articoli", nuevoPedido:"Nuovo ordine", encuesta:"Com'è stata la tua esperienza?", enviarEncuesta:"Invia opinione", saltarEncuesta:"Salta", graciasEncuesta:"Grazie! 🙏", comoLlegar:"Come arrivare", abrirMaps:"Apri in Maps →" },
-  fr: { flag:"🇫🇷", langName:"Français",  todo:"Tout", oferta:"Le chef recommande", efectivo:"Espèces", tarjeta:"Carte", precios:"Prix en pesos argentins · TVA incluse", verPedido:"🛒 Panier", tuPedido:"Votre commande", revisaPedido:"Vérifiez votre commande", mostrarMozo:"Prêt ! Montrez cet écran au serveur", instruccion:"Le serveur notera votre commande", carritoVacio:"Votre panier est vide", verMenu:"Voir le menu", confirmar:"Confirmer et appeler le serveur", volver:"← Retour", cu:"p/u", item:"article", items:"articles", nuevoPedido:"Nouvelle commande", encuesta:"Comment était votre expérience ?", enviarEncuesta:"Envoyer l'avis", saltarEncuesta:"Passer", graciasEncuesta:"Merci ! 🙏", comoLlegar:"Comment y aller", abrirMaps:"Ouvrir dans Maps →" },
-  ru: { flag:"🇷🇺", langName:"Русский",   todo:"Всё",  oferta:"Рекомендует шеф", efectivo:"Наличные", tarjeta:"Карта", precios:"Цены в аргентинских песо · НДС включён", verPedido:"🛒 Корзина", tuPedido:"Ваш заказ", revisaPedido:"Проверьте ваш заказ", mostrarMozo:"Готово! Покажите экран официанту", instruccion:"Официант запишет ваш заказ", carritoVacio:"Корзина пуста", verMenu:"Смотреть меню", confirmar:"Подтвердить и позвать официанта", volver:"← Назад", cu:"шт.", item:"позиция", items:"позиции", nuevoPedido:"Новый заказ", encuesta:"Как вам наше меню?", enviarEncuesta:"Отправить отзыв", saltarEncuesta:"Пропустить", graciasEncuesta:"Спасибо! 🙏", comoLlegar:"Как добраться", abrirMaps:"Открыть в Maps →" },
+  es: { flag:"🇪🇸", langName:"Español",   todo:"Todo", oferta:"Chef recomienda", efectivo:"Efectivo", tarjeta:"Tarjeta", precios:"Precios en pesos argentinos · IVA incluido", verPedido:"🛒 Carrito", tuPedido:"Tu pedido", revisaPedido:"Revisá tu pedido", mostrarMozo:"¡Listo! Mostrá esta pantalla al mozo", instruccion:"El mozo tomará nota de tu pedido", carritoVacio:"Tu carrito está vacío", verMenu:"Ver menú", confirmar:"Confirmar y llamar al mozo", volver:"← Volver", cu:"c/u", item:"item", items:"items", nuevoPedido:"Nuevo pedido", encuesta:"¿Cómo fue tu experiencia?", enviarEncuesta:"Enviar opinión", saltarEncuesta:"Saltar", graciasEncuesta:"¡Gracias! 🙏", comoLlegar:"Cómo llegar", abrirMaps:"Abrir en Maps →", notaLabel:"Pedido especial", notaPlaceholder:"Ej: Sin cebolla, término medio...", notaWaiter:"Nota para el mozo" },
+  en: { flag:"🇬🇧", langName:"English",   todo:"All",  oferta:"Chef recommends", efectivo:"Cash", tarjeta:"Card", precios:"Prices in Argentine pesos · VAT included", verPedido:"🛒 Cart", tuPedido:"Your order", revisaPedido:"Review your order", mostrarMozo:"Done! Show this screen to the waiter", instruccion:"The waiter will take note of your order", carritoVacio:"Your cart is empty", verMenu:"See menu", confirmar:"Confirm & call waiter", volver:"← Back", cu:"each", item:"item", items:"items", nuevoPedido:"New order", encuesta:"How was your experience?", enviarEncuesta:"Send feedback", saltarEncuesta:"Skip", graciasEncuesta:"Thanks! 🙏", comoLlegar:"How to get here", abrirMaps:"Open in Maps →", notaLabel:"Special request", notaPlaceholder:"e.g. No onion, medium rare...", notaWaiter:"Note for the waiter" },
+  pt: { flag:"🇧🇷", langName:"Português", todo:"Tudo", oferta:"Chef recomenda", efectivo:"Dinheiro", tarjeta:"Cartão", precios:"Preços em pesos argentinos · IVA incluído", verPedido:"🛒 Carrinho", tuPedido:"Seu pedido", revisaPedido:"Revise seu pedido", mostrarMozo:"Pronto! Mostre esta tela ao garçom", instruccion:"O garçom anotará seu pedido", carritoVacio:"Seu carrinho está vazio", verMenu:"Ver cardápio", confirmar:"Confirmar e chamar o garçom", volver:"← Voltar", cu:"un.", item:"item", items:"itens", nuevoPedido:"Novo pedido", encuesta:"Como foi sua experiência?", enviarEncuesta:"Enviar opinião", saltarEncuesta:"Pular", graciasEncuesta:"Obrigado! 🙏", comoLlegar:"Como chegar", abrirMaps:"Abrir no Maps →", notaLabel:"Pedido especial", notaPlaceholder:"Ex: Sem cebola, ao ponto...", notaWaiter:"Nota para o garçom" },
+  it: { flag:"🇮🇹", langName:"Italiano",  todo:"Tutto", oferta:"Lo chef consiglia", efectivo:"Contanti", tarjeta:"Carta", precios:"Prezzi in pesos argentini · IVA inclusa", verPedido:"🛒 Carrello", tuPedido:"Il tuo ordine", revisaPedido:"Rivedi il tuo ordine", mostrarMozo:"Fatto! Mostra questo schermo al cameriere", instruccion:"Il cameriere prenderà nota del tuo ordine", carritoVacio:"Il carrello è vuoto", verMenu:"Vedi menù", confirmar:"Conferma e chiama il cameriere", volver:"← Torna", cu:"cad.", item:"articolo", items:"articoli", nuevoPedido:"Nuovo ordine", encuesta:"Com'è stata la tua esperienza?", enviarEncuesta:"Invia opinione", saltarEncuesta:"Salta", graciasEncuesta:"Grazie! 🙏", comoLlegar:"Come arrivare", abrirMaps:"Apri in Maps →", notaLabel:"Richiesta speciale", notaPlaceholder:"Es: Senza cipolla, cottura media...", notaWaiter:"Nota per il cameriere" },
+  fr: { flag:"🇫🇷", langName:"Français",  todo:"Tout", oferta:"Le chef recommande", efectivo:"Espèces", tarjeta:"Carte", precios:"Prix en pesos argentins · TVA incluse", verPedido:"🛒 Panier", tuPedido:"Votre commande", revisaPedido:"Vérifiez votre commande", mostrarMozo:"Prêt ! Montrez cet écran au serveur", instruccion:"Le serveur notera votre commande", carritoVacio:"Votre panier est vide", verMenu:"Voir le menu", confirmar:"Confirmer et appeler le serveur", volver:"← Retour", cu:"p/u", item:"article", items:"articles", nuevoPedido:"Nouvelle commande", encuesta:"Comment était votre expérience ?", enviarEncuesta:"Envoyer l'avis", saltarEncuesta:"Passer", graciasEncuesta:"Merci ! 🙏", comoLlegar:"Comment y aller", abrirMaps:"Ouvrir dans Maps →", notaLabel:"Demande spéciale", notaPlaceholder:"Ex: Sans oignon, à point...", notaWaiter:"Note pour le serveur" },
+  ru: { flag:"🇷🇺", langName:"Русский",   todo:"Всё",  oferta:"Рекомендует шеф", efectivo:"Наличные", tarjeta:"Карта", precios:"Цены в аргентинских песо · НДС включён", verPedido:"🛒 Корзина", tuPedido:"Ваш заказ", revisaPedido:"Проверьте ваш заказ", mostrarMozo:"Готово! Покажите экран официанту", instruccion:"Официант запишет ваш заказ", carritoVacio:"Корзина пуста", verMenu:"Смотреть меню", confirmar:"Подтвердить и позвать официанта", volver:"← Назад", cu:"шт.", item:"позиция", items:"позиции", nuevoPedido:"Новый заказ", encuesta:"Как вам наше меню?", enviarEncuesta:"Отправить отзыв", saltarEncuesta:"Пропустить", graciasEncuesta:"Спасибо! 🙏", comoLlegar:"Как добраться", abrirMaps:"Открыть в Maps →", notaLabel:"Особое пожелание", notaPlaceholder:"Напр: Без лука, средняя прожарка...", notaWaiter:"Примечание для официанта" },
 };
 
 const MENU: MenuItem[] = [
@@ -230,9 +231,47 @@ export default function App() {
   const [pedidoEnviado, setPedidoEnviado] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [notasES, setNotasES] = useState<Record<string,string>>({});
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => { setTimeout(() => setLoaded(true), 150); }, []);
   useEffect(() => { if (pedidoEnviado) setTimeout(() => setShowCheck(true), 100); else setShowCheck(false); }, [pedidoEnviado]);
+
+  async function confirmarPedido() {
+    const itemsConNota = carrito.filter(i => i.nota && i.nota.trim());
+    if (itemsConNota.length === 0 || lang === "es") {
+      setPedidoEnviado(true);
+      return;
+    }
+    setTranslating(true);
+    try {
+      const lista = itemsConNota.map(i => `"${i.nombre}": "${i.nota}"`).join("\n");
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 500,
+          messages: [{
+            role: "user",
+            content: `Translate these restaurant order notes to Spanish. Return ONLY a JSON object with the dish name as key and translated note as value, no extra text:\n${lista}`
+          }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text ?? "{}";
+      const clean = text.replace(/```json|```/g,"").trim();
+      const translated = JSON.parse(clean);
+      setNotasES(translated);
+    } catch {
+      // si falla, mostrar nota original
+      const fallback: Record<string,string> = {};
+      itemsConNota.forEach(i => { fallback[i.nombre] = i.nota!; });
+      setNotasES(fallback);
+    }
+    setTranslating(false);
+    setPedidoEnviado(true);
+  }
 
   function chooseLang(l: Lang) { setLang(l); setLangAnim(true); setTimeout(() => { setLangSelected(true); window.scrollTo(0,0); }, 500); }
 
@@ -260,7 +299,7 @@ export default function App() {
     });
   }
   function cantidadEnCarrito(nombre: string): number { return carrito.find(c => c.nombre===nombre)?.cantidad || 0; }
-  function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); }
+  function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); setNotasES({}); }
 
   const categories = ["all", ...Array.from(new Set(MENU.map(i => i.categoria)))];
   const filtered = activeCategory==="all" ? MENU : MENU.filter(i => i.categoria===activeCategory);
@@ -337,10 +376,19 @@ export default function App() {
               </div>
               <div style={{padding:"4px 16px 0"}}>
                 {carrito.map((item,i) => (
-                  <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)"}}>
-                    <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
-                    <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
-                    <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
+                  <div key={i} style={{padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)",background:item.nota ? "rgba(255,240,200,0.35)" : "transparent"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
+                      <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
+                      <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
+                    </div>
+                    {(notasES[item.nombre] || item.nota) && (
+                      <div style={{marginTop:5,marginLeft:40}}>
+                        <span style={{fontSize:11,color:"#8b6914",background:"rgba(180,130,0,0.12)",border:"0.5px solid rgba(180,130,0,0.3)",borderRadius:4,padding:"2px 8px",display:"inline-block"}}>
+                          📝 {notasES[item.nombre] || item.nota}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -350,7 +398,7 @@ export default function App() {
               </div>
               <div style={{height:14,background:"repeating-linear-gradient(-45deg,#fffde7,#fffde7 6px,#f0eac0 6px,#f0eac0 12px)"}}/>
             </div>
-            <button onClick={nuevosPedido} style={{width:"100%",padding:"12px",background:"transparent",color:"#333",border:"1.5px solid #4A4A4A",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",fontWeight:500}}>{t.nuevoPedido}</button>
+            <button onClick={nuevosPedido} style={{width:"100%",padding:"14px",background:"#C0392B",color:WHITE,border:"none",fontSize:9,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",fontWeight:600,borderRadius:8,marginTop:8}}>{t.nuevoPedido}</button>
           </div>
         ) : (
           <div style={{padding:"20px",flex:1}}>
@@ -364,21 +412,44 @@ export default function App() {
             ) : (
               <>
                 {carrito.map((item,idx) => (
-                  <div key={idx} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:`1px solid ${BORDER}`}}>
-                    {item.imagen
-                      ? <img src={item.imagen} alt={item.nombre} style={{width:48,height:48,borderRadius:6,objectFit:"cover",flexShrink:0,border:`1px solid ${BORDER}`}}/>
-                      : null
-                    }
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:NAVY}}>{getCartNombre(item)}</div>
-                      <div style={{fontSize:11,color:MUTED,marginTop:1}}>{formatPeso(item.precio)} {t.cu}</div>
+                  <div key={idx} style={{borderBottom:`1px solid ${BORDER}`}}>
+                    <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0 10px"}}>
+                      {item.imagen
+                        ? <img src={item.imagen} alt={item.nombre} style={{width:48,height:48,borderRadius:6,objectFit:"cover",flexShrink:0,border:`1px solid ${BORDER}`}}/>
+                        : null
+                      }
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:16,color:NAVY}}>{getCartNombre(item)}</div>
+                        <div style={{fontSize:11,color:MUTED,marginTop:1}}>{formatPeso(item.precio)} {t.cu}</div>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <button onClick={() => quitarItem(item.nombre)} style={{width:26,height:26,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                        <span style={{fontSize:13,color:NAVY,minWidth:16,textAlign:"center"}}>{item.cantidad}</span>
+                        <button onClick={() => agregarItem(item as unknown as MenuItem)} style={{width:26,height:26,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                      </div>
+                      <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
                     </div>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <button onClick={() => quitarItem(item.nombre)} style={{width:26,height:26,border:`1px solid ${BORDER}`,background:"transparent",color:MUTED,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                      <span style={{fontSize:13,color:NAVY,minWidth:16,textAlign:"center"}}>{item.cantidad}</span>
-                      <button onClick={() => agregarItem(item as unknown as MenuItem)} style={{width:26,height:26,border:`1px solid ${TEAL}`,background:TEAL,color:WHITE,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-                    </div>
-                    <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
+                    {/* Кнопка-раскрывашка пожеланий */}
+                    {!item.nota && (
+                      <div
+                        onClick={() => setCarrito(prev => prev.map((c,i) => i===idx ? {...c, nota:""} : c))}
+                        style={{fontSize:11,color:TEAL,cursor:"pointer",paddingBottom:10,paddingLeft:item.imagen?60:0,display:"flex",alignItems:"center",gap:4,userSelect:"none"}}
+                      >
+                        <span style={{fontSize:13}}>＋</span> {t.notaLabel}
+                      </div>
+                    )}
+                    {item.nota !== undefined && (
+                      <div style={{paddingBottom:12,paddingLeft:item.imagen?60:0}}>
+                        <input
+                          type="text"
+                          value={item.nota}
+                          placeholder={t.notaPlaceholder}
+                          onChange={e => setCarrito(prev => prev.map((c,i) => i===idx ? {...c, nota:e.target.value} : c))}
+                          style={{width:"100%",fontSize:12,padding:"7px 10px",border:`1px solid ${BORDER}`,background:WHITE,fontFamily:"inherit",color:NAVY,borderRadius:4,outline:"none"}}
+                        />
+                        <div style={{fontSize:10,color:MUTED,marginTop:3,letterSpacing:0.3}}>🌐 {t.notaWaiter}</div>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div style={{display:"flex",alignItems:"baseline",gap:8,padding:"16px 0",borderTop:`1px solid ${TEAL}30`,marginTop:8}}>
@@ -386,7 +457,9 @@ export default function App() {
                   <div style={{flex:2,borderBottom:`1px dotted ${BORDER}`,marginBottom:4}}/>
                   <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:30,letterSpacing:0.5,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
                 </div>
-                <button onClick={() => setPedidoEnviado(true)} style={{width:"100%",padding:"15px",background:"#C0392B",color:WHITE,border:"none",fontSize:9,fontWeight:600,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",fontFamily:"inherit",marginTop:8,borderRadius:8}}>📋 {t.confirmar}</button>
+                <button onClick={confirmarPedido} disabled={translating} style={{width:"100%",padding:"15px",background:translating?"#999":"#C0392B",color:WHITE,border:"none",fontSize:9,fontWeight:600,letterSpacing:3,textTransform:"uppercase",cursor:translating?"wait":"pointer",fontFamily:"inherit",marginTop:8,borderRadius:8}}>
+                  {translating ? "⏳ " + (t.notaWaiter ?? "Traduciendo...") : "📋 " + t.confirmar}
+                </button>
               </>
             )}
           </div>
