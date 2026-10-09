@@ -238,35 +238,59 @@ export default function App() {
   useEffect(() => { if (pedidoEnviado) setTimeout(() => setShowCheck(true), 100); else setShowCheck(false); }, [pedidoEnviado]);
 
   async function confirmarPedido() {
-    const itemsConNota = carrito.filter(i => i.nota && i.nota.trim());
-    if (itemsConNota.length === 0 || lang === "es") {
+    const itemsConNota = carrito
+      .map((item, idx) => ({ item, idx }))
+      .filter(({ item }) => item.nota && item.nota.trim());
+
+    if (itemsConNota.length === 0) {
       setPedidoEnviado(true);
       return;
     }
+
+    // Si el idioma ya es español no hace falta traducir — copiar tal cual
+    if (lang === "es") {
+      const fallback: Record<string, string> = {};
+      itemsConNota.forEach(({ item }) => { fallback[item.nombre] = item.nota!; });
+      setNotasES(fallback);
+      setPedidoEnviado(true);
+      return;
+    }
+
     setTranslating(true);
     try {
-      const lista = itemsConNota.map(i => `"${i.nombre}": "${i.nota}"`).join("\n");
+      // Usamos índice como clave para evitar problemas de formato de nombre
+      const lista = itemsConNota
+        .map(({ item, idx }) => `${idx}: "${item.nota}"`)
+        .join("\n");
+
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 500,
           messages: [{
             role: "user",
-            content: `Translate these restaurant order notes to Spanish. Return ONLY a JSON object with the dish name as key and translated note as value, no extra text:\n${lista}`
+            content: `You are a restaurant assistant. Translate each note below to Spanish. The customer may write in any language. Return ONLY a valid JSON object where keys are the numbers and values are the Spanish translations. No explanation, no markdown.\n\n${lista}`
           }]
         })
       });
+
       const data = await res.json();
       const text = data.content?.[0]?.text ?? "{}";
-      const clean = text.replace(/```json|```/g,"").trim();
-      const translated = JSON.parse(clean);
-      setNotasES(translated);
+      const clean = text.replace(/```json|```/g, "").trim();
+      const byIndex: Record<string, string> = JSON.parse(clean);
+
+      // Mapear de vuelta al nombre del plato
+      const result: Record<string, string> = {};
+      itemsConNota.forEach(({ item, idx }) => {
+        result[item.nombre] = byIndex[String(idx)] ?? item.nota!;
+      });
+      setNotasES(result);
     } catch {
-      // si falla, mostrar nota original
-      const fallback: Record<string,string> = {};
-      itemsConNota.forEach(i => { fallback[i.nombre] = i.nota!; });
+      // Fallback: mostrar nota original sin traducir
+      const fallback: Record<string, string> = {};
+      itemsConNota.forEach(({ item }) => { fallback[item.nombre] = item.nota!; });
       setNotasES(fallback);
     }
     setTranslating(false);
