@@ -268,9 +268,8 @@ export default function App() {
 
     setTranslating(true);
     try {
-      // Usamos índice como clave para evitar problemas de formato de nombre
       const lista = itemsConNota
-        .map(({ item, idx }) => `${idx}: "${item.nota}"`)
+        .map(({ item, idx }) => `${idx}|||${item.nota}`)
         .join("\n");
 
       const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -281,21 +280,30 @@ export default function App() {
           max_tokens: 500,
           messages: [{
             role: "user",
-            content: `You are a restaurant assistant. Translate each note below to Spanish. The customer may write in any language. Return ONLY a valid JSON object where keys are the numbers and values are the Spanish translations. No explanation, no markdown.\n\n${lista}`
+            content: `Translate each restaurant order note to Spanish. Input format: "INDEX|||NOTE". Return ONLY lines in format "INDEX|||TRANSLATED_NOTE". No JSON, no markdown, no explanation.\n\n${lista}`
           }]
         })
       });
 
       const data = await res.json();
-      const text = data.content?.[0]?.text ?? "{}";
-      const clean = text.replace(/```json|```/g, "").trim();
-      const byIndex: Record<string, string> = JSON.parse(clean);
+      const text: string = data.content?.[0]?.text ?? "";
 
-      // Mapear de vuelta al nombre del plato
+      // Parsear línea por línea: "0|||Sin cebolla"
       const result: Record<string, string> = {};
-      itemsConNota.forEach(({ item, idx }) => {
-        result[item.nombre] = byIndex[String(idx)] ?? item.nota!;
+      text.split("\n").forEach(line => {
+        const [idxStr, ...rest] = line.split("|||");
+        const translated = rest.join("|||").trim();
+        if (!idxStr || !translated) return;
+        const idx = parseInt(idxStr.trim(), 10);
+        const match = itemsConNota.find(x => x.idx === idx);
+        if (match) result[match.item.nombre] = translated;
       });
+
+      // Si algo no se tradujo — poner el original
+      itemsConNota.forEach(({ item }) => {
+        if (!result[item.nombre]) result[item.nombre] = item.nota!;
+      });
+
       setNotasES(result);
     } catch {
       // Fallback: mostrar nota original sin traducir
@@ -445,20 +453,25 @@ export default function App() {
               </div>
               <div style={{padding:"4px 16px 0"}}>
                 {carrito.map((item,i) => (
-                  <div key={i} style={{padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)",background:item.nota ? "rgba(255,240,200,0.35)" : "transparent"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
-                      <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
-                      <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
-                    </div>
-                    {(notasES[item.nombre] || item.nota) && (
-                      <div style={{marginTop:5,marginLeft:40}}>
-                        <span style={{fontSize:11,color:"#8b6914",background:"rgba(180,130,0,0.12)",border:"0.5px solid rgba(180,130,0,0.3)",borderRadius:4,padding:"2px 8px",display:"inline-block"}}>
-                          📝 {notasES[item.nombre] || item.nota}
-                        </span>
+                  {(() => {
+                    const notaFinal = (notasES[item.nombre] || (item.nota && item.nota.trim())) || "";
+                    return (
+                      <div key={i} style={{padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)",background:notaFinal ? "rgba(255,240,200,0.35)" : "transparent"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
+                          <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
+                          <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
+                        </div>
+                        {notaFinal && (
+                          <div style={{marginTop:5,marginLeft:40}}>
+                            <span style={{fontSize:11,color:"#8b6914",background:"rgba(180,130,0,0.12)",border:"0.5px solid rgba(180,130,0,0.3)",borderRadius:4,padding:"2px 8px",display:"inline-block"}}>
+                              📝 {notaFinal}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 ))}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 16px",paddingTop:12,paddingBottom:14,borderTop:"2px dashed rgba(0,0,0,0.15)",marginTop:4}}>
