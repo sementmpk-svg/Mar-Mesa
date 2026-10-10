@@ -22,7 +22,7 @@ const CONFIG = {
   pagoEfectivo:    true,
   pagoMercadoPago: true,
   pagoTarjeta:     true,
-  sheetsUrl:       "PEGAR_URL_DE_GOOGLE_APPS_SCRIPT_AQUI",
+  sheetsUrl:       "https://script.google.com/macros/s/AKfycbxEgMEmTs5gMla04g3IwHhQ7WVsAMBpHT7TBkBBiVL5mD20wY7COPmW0RHsKahkZxGZ/exec",
 };
 
 const NAVY   = "#1A1A1A";
@@ -243,6 +243,11 @@ export default function App() {
       .filter(({ item }) => item.nota && item.nota.trim());
 
     if (itemsConNota.length === 0) {
+      enviarAnalytics("pedido", {
+        platos: carrito.map(i => `${i.nombre} ×${i.cantidad}`).join(", "),
+        total: totalPrecio,
+        notas: "",
+      });
       setPedidoEnviado(true);
       return;
     }
@@ -252,6 +257,11 @@ export default function App() {
       const fallback: Record<string, string> = {};
       itemsConNota.forEach(({ item }) => { fallback[item.nombre] = item.nota!; });
       setNotasES(fallback);
+      enviarAnalytics("pedido", {
+        platos: carrito.map(i => `${i.nombre} ×${i.cantidad}`).join(", "),
+        total: totalPrecio,
+        notas: carrito.filter(i => i.nota).map(i => `${i.nombre}: ${i.nota}`).join(" | "),
+      });
       setPedidoEnviado(true);
       return;
     }
@@ -294,10 +304,20 @@ export default function App() {
       setNotasES(fallback);
     }
     setTranslating(false);
+    enviarAnalytics("pedido", {
+      platos: carrito.map(i => `${i.nombre} ×${i.cantidad}`).join(", "),
+      total: totalPrecio,
+      notas: carrito.filter(i => i.nota).map(i => `${i.nombre}: ${i.nota}`).join(" | "),
+    });
     setPedidoEnviado(true);
   }
 
-  function chooseLang(l: Lang) { setLang(l); setLangAnim(true); setTimeout(() => { setLangSelected(true); window.scrollTo(0,0); }, 500); }
+  function chooseLang(l: Lang) {
+    setLang(l);
+    setLangAnim(true);
+    enviarAnalytics("idioma");
+    setTimeout(() => { setLangSelected(true); window.scrollTo(0,0); }, 500);
+  }
 
   const t = T[lang];
   const totalItems = carrito.reduce((s,i) => s+i.cantidad, 0);
@@ -324,6 +344,31 @@ export default function App() {
   }
   function cantidadEnCarrito(nombre: string): number { return carrito.find(c => c.nombre===nombre)?.cantidad || 0; }
   function nuevosPedido() { setCarrito([]); setPedidoEnviado(false); setShowCarrito(false); setNotasES({}); }
+
+  function enviarAnalytics(evento: "idioma" | "pedido", extraData?: object) {
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString("es-AR");
+    const hora  = ahora.toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
+    const dispositivo = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "Mobile" : "Desktop";
+
+    const payload = {
+      fecha,
+      hora,
+      idioma: lang,
+      dispositivo,
+      evento,
+      ...extraData,
+    };
+
+    try {
+      fetch(CONFIG.sheetsUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch { /* silencioso */ }
+  }
 
   const categories = ["all", ...Array.from(new Set(MENU.map(i => i.categoria)))];
   const filtered = activeCategory==="all" ? MENU : MENU.filter(i => i.categoria===activeCategory);
