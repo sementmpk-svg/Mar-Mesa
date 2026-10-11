@@ -452,27 +452,25 @@ export default function App() {
                 🧾 {carrito.length} {carrito.length===1?t.item:t.items}
               </div>
               <div style={{padding:"4px 16px 0"}}>
-                {carrito.map((item,i) => (
-                  {(() => {
-                    const notaFinal = (notasES[item.nombre] || (item.nota && item.nota.trim())) || "";
-                    return (
-                      <div key={i} style={{padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)",background:notaFinal ? "rgba(255,240,200,0.35)" : "transparent"}}>
-                        <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
-                          <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
-                          <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
-                        </div>
-                        {notaFinal && (
-                          <div style={{marginTop:5,marginLeft:40}}>
-                            <span style={{fontSize:11,color:"#8b6914",background:"rgba(180,130,0,0.12)",border:"0.5px solid rgba(180,130,0,0.3)",borderRadius:4,padding:"2px 8px",display:"inline-block"}}>
-                              📝 {notaFinal}
-                            </span>
-                          </div>
-                        )}
+                {carrito.map((item,i) => {
+                  const notaFinal = notasES[item.nombre] || (item.nota && item.nota.trim()) || "";
+                  return (
+                    <div key={i} style={{padding:"11px 0",borderBottom:"1px solid rgba(0,0,0,0.07)",background:notaFinal ? "rgba(255,240,200,0.35)" : "transparent"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{fontSize:18,fontWeight:800,color:"#1a1a1a",minWidth:32,fontFamily:"'Bebas Neue',cursive",letterSpacing:0.5}}>×{item.cantidad}</span>
+                        <span style={{fontSize:16,color:"#1a1a1a",flex:1,fontWeight:600,lineHeight:1.2}}>{item.nombre}</span>
+                        <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:"#1a5c2a",flexShrink:0}}>{formatPeso(item.precio*item.cantidad)}</span>
                       </div>
-                    );
-                  })()}
-                ))}
+                      {notaFinal && (
+                        <div style={{marginTop:5,marginLeft:40}}>
+                          <span style={{fontSize:11,color:"#8b6914",background:"rgba(180,130,0,0.12)",border:"0.5px solid rgba(180,130,0,0.3)",borderRadius:4,padding:"2px 8px",display:"inline-block"}}>
+                            📝 {notaFinal}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 16px",paddingTop:12,paddingBottom:14,borderTop:"2px dashed rgba(0,0,0,0.15)",marginTop:4}}>
                 <span style={{fontSize:12,fontWeight:800,letterSpacing:3,textTransform:"uppercase",flex:1,color:"#1a1a1a"}}>TOTAL</span>
@@ -512,7 +510,7 @@ export default function App() {
                       <div style={{fontFamily:"'Bebas Neue',cursive",fontSize:22,letterSpacing:0.5,color:TEAL2,minWidth:70,textAlign:"right"}}>{formatPeso(item.precio*item.cantidad)}</div>
                     </div>
                     {/* Кнопка-раскрывашка пожеланий */}
-                    {!item.nota && (
+                    {item.nota === undefined && (
                       <div
                         onClick={() => setCarrito(prev => prev.map((c,i) => i===idx ? {...c, nota:""} : c))}
                         style={{fontSize:11,color:TEAL,cursor:"pointer",paddingBottom:10,paddingLeft:item.imagen?60:0,display:"flex",alignItems:"center",gap:4,userSelect:"none"}}
@@ -520,16 +518,22 @@ export default function App() {
                         <span style={{fontSize:13}}>＋</span> {t.notaLabel}
                       </div>
                     )}
-                    {item.nota !== undefined && (
+                    {typeof item.nota === "string" && (
                       <div style={{paddingBottom:12,paddingLeft:item.imagen?60:0}}>
                         <input
                           type="text"
                           value={item.nota}
                           placeholder={t.notaPlaceholder}
+                          autoFocus={item.nota === ""}
                           onChange={e => setCarrito(prev => prev.map((c,i) => i===idx ? {...c, nota:e.target.value} : c))}
-                          style={{width:"100%",fontSize:12,padding:"7px 10px",border:`1px solid ${BORDER}`,background:WHITE,fontFamily:"inherit",color:NAVY,borderRadius:4,outline:"none"}}
+                          style={{width:"100%",fontSize:12,padding:"7px 10px",border:`1px solid ${TEAL}`,background:WHITE,fontFamily:"inherit",color:NAVY,borderRadius:4,outline:"none"}}
                         />
-                        <div style={{fontSize:10,color:MUTED,marginTop:3,letterSpacing:0.3}}>🌐 {t.notaWaiter}</div>
+                        <div style={{fontSize:10,color:MUTED,marginTop:3,letterSpacing:0.3,display:"flex",alignItems:"center",gap:4}}>
+                          🌐 {t.notaWaiter}
+                          <span
+                            onClick={() => setCarrito(prev => prev.map((c,i) => i===idx ? {...c, nota:undefined} : c))}
+                            style={{marginLeft:"auto",cursor:"pointer",color:MUTED,fontSize:11}}>✕</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -540,7 +544,7 @@ export default function App() {
                   <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:30,letterSpacing:0.5,color:TEAL2}}>{formatPeso(totalPrecio)}</span>
                 </div>
                 <button onClick={confirmarPedido} disabled={translating} style={{width:"100%",padding:"15px",background:translating?"#999":"#C0392B",color:WHITE,border:"none",fontSize:9,fontWeight:600,letterSpacing:3,textTransform:"uppercase",cursor:translating?"wait":"pointer",fontFamily:"inherit",marginTop:8,borderRadius:8}}>
-                  {translating ? "⏳ " + (t.notaWaiter ?? "Traduciendo...") : "📋 " + t.confirmar}
+                  {translating ? "⏳ Traduciendo..." : "📋 " + t.confirmar}
                 </button>
               </>
             )}
